@@ -459,11 +459,17 @@
         </div>
         <div class="demo-action-buttons">
           <button class="btn btn-primary" onclick="triggerDemoTurn1()">
-            1️⃣ Show Boarding Pass Slip & Ask: "My Frankfurt flight was canceled due to weather..."
+            1️⃣ [EN + ಕನ್ನಡ + हिन्दी] Show Slip & Ask: "Namaskara! Svalpa sahaya maadi... मेरी फ्लाइट कैंसिल हो गई..."
           </button>
           <button class="btn btn-emerald" onclick="triggerDemoTurn2()">
-            2️⃣ Reply Preference: "I prefer the Morning departure (08:30 LH400) with Window Seat 04A."
+            2️⃣ [EN + ಕನ್ನಡ + हिन्दी] Reply Pref & Hotel Bill: "ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Morning LH400)... यह देखो होटल का बिल (€245)"
           </button>
+        </div>
+
+        <div style="background:#0b1528; border:1px solid #1e3a8a; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.5; color:#e2e8f0;">
+          <div style="font-weight:800; color:#38bdf8; margin-bottom:4px;">🎙️ LIVE TELEPROMPTER SCRIPT (Speak into Mic or Click 1️⃣ / 2️⃣ Above):</div>
+          <div><strong>Act 1 (Hold Boarding Pass Slip):</strong> <em>"Namaskara Aria! <strong>ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡಿ (Svalpa sahaya maadi)</strong>. I'm stuck at Frankfurt Terminal 1—<strong>मेरी कनेक्टिंग फ्लाइट LH401 मौसम की वजह से कैंसिल हो गई है (Meri connecting flight LH401 mausam ki wajah se cancel ho gayi hai)</strong>. Look at my slip on camera—<strong>ನನ್ನ ಬ್ಯಾಗ್ ಪ್ರಿಯಾರಿಟಿ ಟ್ಯಾಗ್ ಇದೆ (Nanna bag priority tag ide)</strong>, PNR LH8942X, tag 0220-774910-PRIO. <strong>थोड़ा जल्दी चेक करके बताओ ना (Thoda jaldi check karke batao na)</strong>—can you verify my EU261 compensation and rebook me on a Star Alliance flight to JFK?"</em></div>
+          <div style="margin-top:6px;"><strong>Act 2 (While Filler Plays + Show Hotel Receipt):</strong> <em>"Dhanyavaada! <strong>ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Beligge flight saaku)</strong>—book the 08:30 AM LH400 Morning flight, Seat 04A. <strong>और यह देखो मेरा होटल का बिल (Aur yeh dekho mera hotel ka bill)</strong> for €245 at Sheraton Frankfurt. <strong>ದಯವಿಟ್ಟು ಕನ್ಫರ್ಮ್ ಮಾಡಿ (Dayavittu confirm maadi)!</strong>"</em></div>
         </div>
 
         <div class="chat-transcript" id="transcriptBox">
@@ -889,9 +895,9 @@
       loadSampleProp('boarding_pass');
       transmitCurrentFrameToGemini();
       const promptText =
-        'My connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and baggage claim slip on camera (PNR LH8942X, Bag Tag 0220-774910-PRIO). Can you verify my EU261 and VIP compensation entitlement and rebook me on the next Star Alliance partner flight to New York?';
+        'Namaskara Aria! ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡಿ (Svalpa sahaya maadi). I am stuck at Frankfurt Terminal 1. मेरी कनेक्टिंग फ्लाइट LH401 मौसम की वजह से कैंसिल हो गई है (Meri connecting flight LH401 mausam ki wajah se cancel ho gayi hai). Here is my boarding pass and baggage claim slip on camera — ನನ್ನ ಬ್ಯಾಗ್ ಪ್ರಿಯಾರಿಟಿ ಟ್ಯಾಗ್ ಇದೆ (Nanna bag priority tag ide), PNR LH8942X, Bag Tag 0220-774910-PRIO. थोड़ा जल्दी चेक करके बताओ ना — can you verify my EU261 and VIP compensation entitlement and rebook me on the next Star Alliance partner flight to New York?';
       appendTranscript('user', promptText);
-      logToTerminal('log-thinking', '-> [Thinking]: Formulating multi-step OCR + Flight Inventory + EU261 Policy verification strategy...');
+      logToTerminal('log-thinking', '-> [Thinking]: Formulating multilingual (EN + Kannada + Hindi) OCR + Flight Inventory + EU261 Policy verification strategy...');
       ws.send(
         JSON.stringify({
           realtimeInput: {
@@ -903,8 +909,10 @@
 
     async function triggerDemoTurn2() {
       if (!isConnected) return;
+      loadSampleProp('hotel_receipt');
+      transmitCurrentFrameToGemini();
       const prefText =
-        'I prefer the Morning departure on Lufthansa LH400 (codeshare UA8840) at 08:30 with Upper Deck Business Window Seat 04A. Please finalize the rebooking, transfer my priority bag 0220-774910-PRIO, and issue the EU261 Article 9 hotel reimbursement and VIP voucher.';
+        'Dhanyavaada! ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Beligge flight saaku) — I prefer the Morning departure on Lufthansa LH400 (codeshare UA8840) at 08:30 with Upper Deck Business Window Seat 04A. और यह देखो मेरा होटल का बिल (Aur yeh dekho mera hotel ka bill) from Sheraton Frankfurt Airport for 245 Euros on camera. ದಯವಿಟ್ಟು ಕನ್ಫರ್ಮ್ ಮಾಡಿ (Dayavittu confirm maadi) — please finalize the rebooking, transfer my priority bag 0220-774910-PRIO, and issue the EU261 Article 9 hotel reimbursement and VIP voucher.';
       appendTranscript('user', prefText);
       ws.send(
         JSON.stringify({
