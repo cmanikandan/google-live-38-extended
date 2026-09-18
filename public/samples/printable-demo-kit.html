@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo Kit: Printable Boarding Pass, Priority Bag Slip & IRROPS Hotel Receipt</title>
+  <title>Demo Kit: Nano Banana Boarding Pass Props & Architecture Diagrams</title>
   <style>
     :root {
       --bg: #0f172a;
-      --card: #ffffff;
-      --ink: #0f172a;
-      --lh-navy: #05164d;
-      --lh-yellow: #f9b000;
-      --prio-orange: #ea580c;
-      --prio-red: #dc2626;
+      --card: #1e293b;
+      --border: #334155;
     }
     * { box-sizing: border-box; }
     body {
@@ -23,17 +19,17 @@
       padding: 32px 24px;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
     }
     .header-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e293b;
+      background: var(--card);
       padding: 20px 24px;
       border-radius: 14px;
-      border: 1px solid #334155;
+      border: 1px solid var(--border);
       margin-bottom: 28px;
     }
     .header-bar h1 {
@@ -60,6 +56,14 @@
       align-items: center;
       gap: 8px;
     }
+    .section-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #38bdf8;
+      margin: 0 0 14px 0;
+      font-weight: 800;
+    }
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -67,8 +71,8 @@
       margin-bottom: 32px;
     }
     .photo-card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 18px;
     }
@@ -88,80 +92,6 @@
       border: 2px solid #475569;
       display: block;
     }
-    /* High-Contrast Printable Boarding Pass Card */
-    .printable-ticket {
-      background: #ffffff;
-      color: #0f172a;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      margin-bottom: 28px;
-      border: 2px solid #e2e8f0;
-    }
-    .ticket-top {
-      background: var(--lh-navy);
-      color: #ffffff;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 5px solid var(--lh-yellow);
-    }
-    .ticket-body {
-      padding: 24px;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-    }
-    .kv-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .kv label {
-      display: block;
-      font-size: 11px;
-      text-transform: uppercase;
-      color: #64748b;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-    }
-    .kv div {
-      font-size: 18px;
-      font-weight: 800;
-      color: #0f172a;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
-    .cancelled-stamp {
-      display: inline-block;
-      background: #fee2e2;
-      color: #b91c1c;
-      border: 2px solid #dc2626;
-      padding: 6px 12px;
-      font-weight: 900;
-      font-size: 15px;
-      border-radius: 6px;
-      letter-spacing: 0.8px;
-      margin-top: 12px;
-    }
-    .prio-slip {
-      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
-      color: white;
-      padding: 18px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .prio-slip .tag-box {
-      background: #ffffff;
-      color: #0f172a;
-      padding: 12px;
-      border-radius: 8px;
-      font-family: ui-monospace, monospace;
-      margin-top: 10px;
-    }
     @media print {
       body { background: white; color: black; padding: 0; }
       .header-bar { display: none; }
@@ -172,15 +102,16 @@
   <div class="container">
     <div class="header-bar">
       <div>
-        <h1>✈️ Demo Visual Props: Boarding Pass, Priority Bag Tag & EU261 Hotel Receipt</h1>
-        <p>Hold either image on your phone/printed sheet to your webcam, OR click <strong>"Project Slip to Camera"</strong> directly inside the Concierge Console.</p>
+        <h1>🍌 Nano Banana Demo Kit: Visual OCR Slips & Architecture Diagrams</h1>
+        <p>All visual assets and GCP architecture/sequence diagrams below are generated via <strong>Nano Banana</strong>.</p>
       </div>
       <div style="display: flex; gap: 12px;">
-        <button class="btn" onclick="window.print()">🖨️ Print Visual Slips</button>
+        <button class="btn" onclick="window.print()">🖨️ Print Visual Slips & Diagrams</button>
         <a class="btn" style="background:#10b981;" href="/">⬅️ Back to Concierge Console</a>
       </div>
     </div>
 
+    <div class="section-title">1. Camera OCR Props (Generated via Nano Banana)</div>
     <div class="grid">
       <div class="photo-card">
         <h2>Prop 1: Lufthansa Boarding Pass + Star Alliance Priority Bag Slip</h2>
@@ -194,43 +125,17 @@
       </div>
     </div>
 
-    <div class="printable-ticket">
-      <div class="ticket-top">
-        <div>
-          <div style="font-size: 20px; font-weight: 800; letter-spacing: 0.5px;">LUFTHANSA • STAR ALLIANCE GOLD / UNITED 1K VIP</div>
-          <div style="font-size: 12px; opacity: 0.85;">EXECUTIVE IRREGULAR OPERATIONS (IRROPS) BOARDING & CLAIM VOUCHER</div>
-        </div>
-        <div style="text-align: right; font-family: monospace; font-size: 16px; font-weight: 700;">
-          PNR: LH8942X<br/>
-          SEQ: 004 / PRIORITY
-        </div>
+    <div class="section-title">2. Architecture & Dual-Track Lifecycle Diagrams (Generated via Nano Banana)</div>
+    <div class="grid">
+      <div class="photo-card">
+        <h2>Diagram 1: System Architecture Topology</h2>
+        <p>Shows Split-Screen Web Client, <code>gemini-3.8-live-extended-thinking</code> + <code>gemini-3.8-flash</code> OCR, and <code>NON_BLOCKING</code> CRM & Google Search tools.</p>
+        <img src="/samples/architecture-topology-nano-banana.jpg" alt="Tier-3 Enterprise Contact Center Concierge Architecture Topology" />
       </div>
-      <div class="ticket-body">
-        <div>
-          <div style="font-size: 13px; font-weight: 700; color: #475569;">PASSENGER NAME</div>
-          <div style="font-size: 24px; font-weight: 900; margin-bottom: 8px;">MANIKANDAN / C MR (STAR ALLIANCE GOLD)</div>
-          <span class="cancelled-stamp">STATUS: CANCELLED — WX84 SEVERE THUNDERSTORM GROUND STOP (FRA)</span>
-          <div class="kv-grid">
-            <div class="kv"><label>Disrupted Flight</label><div>LH401 / UA8845</div></div>
-            <div class="kv"><label>Route</label><div>FRA ➔ JFK</div></div>
-            <div class="kv"><label>Cabin / Seat</label><div>BUSINESS 04A</div></div>
-            <div class="kv"><label>Gate / Terminal</label><div>FRA T1 • Z50</div></div>
-            <div class="kv"><label>Hotel Folio (EU261 Art.9)</label><div>EUR 245.00</div></div>
-            <div class="kv"><label>PIR Claim ID</label><div>FRALH44912</div></div>
-          </div>
-        </div>
-        <div class="prio-slip">
-          <div>
-            <div style="font-size: 12px; font-weight: 800; letter-spacing: 1px;">★ STAR ALLIANCE PRIORITY</div>
-            <div style="font-size: 20px; font-weight: 900; margin-top: 4px;">PRIORITY INTERLINE</div>
-          </div>
-          <div class="tag-box">
-            <div style="font-size: 11px; color: #64748b; font-weight: 700;">WORLDTRACER BAG TAG</div>
-            <div style="font-size: 19px; font-weight: 900; color: #b91c1c;">0220-774910-PRIO</div>
-            <div style="font-size: 12px; font-weight: 700; margin-top: 4px;">VAULT: FRA T1 BAY Z50</div>
-            <div style="margin-top: 8px; font-family: monospace; font-size: 14px; letter-spacing: 3px; background: #0f172a; color: white; padding: 6px; text-align: center;">|||| |||| ||||| ||||</div>
-          </div>
-        </div>
+      <div class="photo-card">
+        <h2>Diagram 2: Asynchronous Dual-Track Sequence Lifecycle</h2>
+        <p>Illustrates Phase 1 Spoken Filler (<code>IN_PROGRESS</code>), Phase 2 Parallel Thinking + Async Tools, and Phase 3 Final Synthesis (<code>IDLE</code>).</p>
+        <img src="/samples/extended-thinking-sequence-nano-banana.jpg" alt="Gemini 3.8 Live Extended Thinking Sequence Diagram" />
       </div>
     </div>
   </div>

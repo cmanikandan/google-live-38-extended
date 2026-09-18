@@ -416,6 +416,9 @@
           <button class="btn" onclick="loadSampleProp('hotel_receipt')">
             🧾 Project Prop 2: FRA IRROPS & €245 Sheraton Hotel Receipt
           </button>
+          <button class="btn" onclick="loadSampleProp('arch_diagram')">
+            🍌 Project Nano Banana Architecture Diagram
+          </button>
           <button class="btn" id="webcamToggleBtn" onclick="toggleWebcam()">
             📷 Enable Live Webcam
           </button>
@@ -543,10 +546,12 @@
 
     const propImages = {
       boarding_pass: new Image(),
-      hotel_receipt: new Image()
+      hotel_receipt: new Image(),
+      arch_diagram: new Image()
     };
     propImages.boarding_pass.src = '/samples/sample-fra-boarding-pass-slip.jpg';
     propImages.hotel_receipt.src = '/samples/sample-fra-hotel-pir-receipt.jpg';
+    propImages.arch_diagram.src = '/samples/architecture-topology-nano-banana.jpg';
 
     propImages.boarding_pass.onload = () => {
       if (currentProp === 'boarding_pass') renderVisionCanvas();

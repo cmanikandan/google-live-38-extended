@@ -1,6 +1,6 @@
 # Tier-3 Enterprise Contact Center Concierge (`gemini-3.8-live-extended-thinking`)
 
-An interactive **Split-Screen Multimodal Voice & Vision Demo** built for **Gemini 3.8 Live Extended Thinking** (`gemini-3.8-live-extended-thinking`).
+An interactive **Split-Screen Multimodal Voice & Vision Demo** built for **Gemini 3.8 Live Extended Thinking** (`gemini-3.8-live-extended-thinking`) and **Gemini 3.8 Flash** (`gemini-3.8-flash`).
 
 It demonstrates how an enterprise airline/fintech VIP concierge handles a complex Frankfurt (`FRA`) flight disruption (`LH401 -> JFK`, Weather Code `WX84`) by:
 1. **Reading a Boarding Pass & Star Alliance Priority Baggage Claim Slip (`0220-774910-PRIO`) via Live Video/Camera (`realtimeInput.video`)**
@@ -10,27 +10,21 @@ It demonstrates how an enterprise airline/fintech VIP concierge handles a comple
 
 ---
 
-## Split-Screen Architecture
+## Architecture & Asynchronous Dual-Track Lifecycle (Nano Banana Diagrams)
 
-```text
-+-------------------------------------------------------------+-------------------------------------------------------------+
-| LEFT PANE: MULTIMODAL LIVE STAGE & CRM RESOLUTION LEDGER    | RIGHT PANE: EXTENDED THINKING & NON_BLOCKING TOOL TERMINAL  |
-+-------------------------------------------------------------+-------------------------------------------------------------+
-| [ LIVE WEBCAM / SAMPLE BOARDING PASS SLIP VISION STREAM ]   | -> [Session Setup]: gemini-3.8-live-extended-thinking       |
-|   - Prop #1: Boarding Pass + Priority Bag Tag (LH8942X)     |    thinkingLevel: "HIGH" | behavior: "NON_BLOCKING"         |
-|   - Prop #2: FRA IRROPS Slip + €245 Sheraton Hotel Folio    | -> [Lifecycle]: interaction_status = "IN_PROGRESS"          |
-|   - Live Webcam Picture-in-Picture Mode                     | -> [Spoken Filler]: "I've captured your PNR LH8942X and     |
-+-------------------------------------------------------------+    priority tag 0220-774910-PRIO... Do you prefer Morning   |
-| Audio Waveform: [24kHz Native Audio — Filler / Synthesis]   |    or Evening departure?"                                   |
-| Model State:    [● IN_PROGRESS ➔ ● IDLE]                    | -> [Tool Call: NON_BLOCKING]:                               |
-+-------------------------------------------------------------+    scan_boarding_pass_and_bag_tag({"pnr":"LH8942X"})        |
-| Live CRM & EU261 Resolution Cards:                          |    search_star_alliance_partner_flights({"origin":"FRA"})   |
-| - WorldTracer Bag: 0220-774910-PRIO (FRA T1 Vault)          |    evaluate_eu261_and_vip_entitlement({"code":"WX84"})      |
-| - EU261 Art. 7 Cash: EXEMPT (Art. 5(3) WX84 Weather)        | -> [Tool Result]: 200 OK (1,605 ms)                         |
-| - EU261 Art. 9 Care: ELIGIBLE (€245 Hotel + €45 Meals)      | -> [Lifecycle]: interaction_status = "IDLE"                 |
-| - VIP 1K Override:   $350 Goodwill + LH400 Seat 04A         |                                                             |
-+-------------------------------------------------------------+-------------------------------------------------------------+
-```
+### 1. System Topology (`gemini-3.8-live-extended-thinking` + `gemini-3.8-flash`)
+![Tier-3 Enterprise Contact Center Concierge Architecture Topology](public/samples/architecture-topology-nano-banana.jpg)
+
+### 2. Asynchronous Dual-Track Lifecycle (`interactionStatus: IN_PROGRESS -> IDLE`)
+![Gemini 3.8 Live Extended Thinking Dual-Track Lifecycle Sequence Diagram](public/samples/extended-thinking-sequence-nano-banana.jpg)
+
+---
+
+## Visual Demo Props (Generated with Nano Banana)
+
+| Prop 1: Boarding Pass & Priority Baggage Tag (`LH8942X`) | Prop 2: Frankfurt IRROPS & Sheraton Hotel Receipt (`EUR 245.00`) |
+| :---: | :---: |
+| ![Boarding Pass & Priority Bag Slip](public/samples/sample-fra-boarding-pass-slip.jpg) | ![Frankfurt IRROPS & Sheraton Hotel Receipt](public/samples/sample-fra-hotel-pir-receipt.jpg) |
 
 ---
 
@@ -48,7 +42,7 @@ npm install
 npm start
 ```
 * **Main Split-Screen Concierge App:** [http://localhost:3080](http://localhost:3080)
-* **Printable / Camera-Ready Boarding Pass & IRROPS Receipt Kit:** [http://localhost:3080/samples/printable-demo-kit.html](http://localhost:3080/samples/printable-demo-kit.html)
+* **Printable / Camera-Ready Boarding Pass, Receipt & Architecture Kit:** [http://localhost:3080/samples/printable-demo-kit.html](http://localhost:3080/samples/printable-demo-kit.html)
 
 ### 3. Run the Automated Evaluation Suite
 ```bash
@@ -56,6 +50,6 @@ npm run eval
 ```
 Runs 4 end-to-end evaluations (`evals/run_evals.js`):
 - **EVAL-01**: Verifies `behavior: "NON_BLOCKING"` across all 4 CRM/WorldTracer/EU261 tool declarations and deterministic engine responses.
-- **EVAL-02**: Verifies multimodal Visual OCR extraction against the generated boarding pass (`public/samples/sample-fra-boarding-pass-slip.jpg`) and hotel receipt (`public/samples/sample-fra-hotel-pir-receipt.jpg`).
+- **EVAL-02**: Verifies multimodal Visual OCR extraction via `gemini-3.8-flash` against the generated boarding pass (`public/samples/sample-fra-boarding-pass-slip.jpg`) and hotel receipt (`public/samples/sample-fra-hotel-pir-receipt.jpg`).
 - **EVAL-03**: Connects a live WebSocket client to `gemini-3.8-live-extended-thinking`, streams the JPEG boarding pass frame via `realtimeInput.video` + escalation prompt, and validates `interaction_status` (`IN_PROGRESS` ➔ `IDLE`), native audio streaming, and `NON_BLOCKING` tool execution.
-- **EVAL-04**: Grades the model's legal & VIP policy synthesis against the 4 EU261 Article 5(3) vs. Article 9 + Star Alliance Gold rubrics.
+- **EVAL-04**: Grades the model's legal & VIP policy synthesis via `gemini-3.8-flash` against the 4 EU261 Article 5(3) vs. Article 9 + Star Alliance Gold rubrics.
