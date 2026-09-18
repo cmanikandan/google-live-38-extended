@@ -3,94 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tier-3 Enterprise Contact Center Concierge — Gemini 3.8 Live Extended Thinking</title>
+  <title>Gemini 3.8 Live Extended Thinking — Contact Center Concierge</title>
   <style>
     :root {
-      --bg-dark: #070b14;
-      --panel-bg: #0f172a;
-      --panel-border: #1e293b;
-      --accent-blue: #3b82f6;
-      --accent-amber: #f59e0b;
-      --accent-emerald: #10b981;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg-main: #060911;
+      --bg-surface: #0d1322;
+      --bg-elevated: #131c31;
+      --border: #1e293b;
+      --blue: #3b82f6;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+      --purple: #a855f7;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--bg-dark);
-      color: var(--text-main);
+      background: var(--bg-main);
+      color: var(--text-primary);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
+
+    /* Spacious Top Navigation Bar */
     header {
-      height: 62px;
-      background: #0b1120;
-      border-bottom: 1px solid var(--panel-border);
-      padding: 0 20px;
+      height: 70px;
+      padding: 0 28px;
+      background: rgba(13, 19, 34, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
-    .brand-badge {
+    .brand-pill {
       background: linear-gradient(135deg, #2563eb, #7c3aed);
-      padding: 6px 10px;
+      color: #fff;
+      padding: 7px 12px;
       border-radius: 8px;
+      font-size: 12px;
       font-weight: 800;
-      font-size: 12px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
-    .brand h1 {
+    .brand-title h1 {
       margin: 0;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
+      letter-spacing: -0.2px;
     }
-    .brand span {
+    .brand-title p {
+      margin: 2px 0 0 0;
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
-    .controls-top {
+    .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     select {
-      background: #1e293b;
+      background: var(--bg-elevated);
       border: 1px solid #334155;
-      color: #f8fafc;
-      padding: 7px 10px;
-      border-radius: 7px;
-      font-size: 12px;
+      color: var(--text-primary);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
     }
     .btn {
-      background: #1e293b;
-      color: #f8fafc;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
       border: 1px solid #334155;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.15s ease;
     }
-    .btn:hover { background: #334155; }
+    .btn:hover { background: #1e293b; }
     .btn-primary {
       background: #2563eb;
       border-color: #3b82f6;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     }
     .btn-primary:hover { background: #1d4ed8; }
     .btn-danger {
@@ -103,49 +114,35 @@
       color: #fff;
     }
 
-    .split-layout {
+    /* Spacious Split Workspace */
+    .workspace {
       display: grid;
-      grid-template-columns: 52% 48%;
+      grid-template-columns: 56% 44%;
+      gap: 24px;
+      padding: 24px 28px;
+      max-width: 1720px;
+      width: 100%;
+      margin: 0 auto;
       flex: 1;
-      min-height: 0;
-    }
-    .pane-left {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow-y: auto;
-      border-right: 1px solid var(--panel-border);
-    }
-    .pane-right {
-      background: #050811;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
     }
 
-    /* Live Camera Video Stream Stage */
-    .video-stage-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      overflow: hidden;
+    .left-column {
       display: flex;
       flex-direction: column;
+      gap: 20px;
     }
-    .stage-header {
-      padding: 10px 14px;
-      background: #131c31;
-      border-bottom: 1px solid var(--panel-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 600;
+
+    /* Hero Camera Stage */
+    .camera-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
     }
-    .video-viewport {
+    .camera-viewport {
       position: relative;
-      height: 280px;
+      height: 440px;
       background: #020617;
       display: flex;
       align-items: center;
@@ -158,366 +155,383 @@
       object-fit: cover;
       display: block;
     }
-    #captureCanvas {
-      display: none;
-    }
-    .camera-overlay-pill {
+    #captureCanvas { display: none; }
+
+    .camera-top-hud {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid #334155;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+    .hud-pill {
+      background: rgba(9, 13, 24, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 6px 12px;
+      border-radius: 999px;
       font-family: var(--mono);
+      font-size: 12px;
       color: #38bdf8;
+      font-weight: 600;
     }
-    .camera-guide-frame {
+    .scan-reticle {
       position: absolute;
-      width: 74%;
-      height: 76%;
-      border: 2px dashed rgba(56, 189, 248, 0.55);
-      border-radius: 12px;
+      width: 68%;
+      height: 68%;
+      border: 2px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 16px;
       pointer-events: none;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      padding-bottom: 8px;
-      font-size: 11px;
-      color: rgba(226, 232, 240, 0.85);
+      padding-bottom: 12px;
+      font-size: 12px;
+      color: rgba(248, 250, 252, 0.85);
       font-family: var(--mono);
-    }
-    .camera-toolbar {
-      padding: 10px 14px;
-      background: #0b1324;
-      border-top: 1px solid var(--panel-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
     }
 
-    /* Audio Waveform & Model State Card */
-    .waveform-state-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 12px 16px;
+    /* Integrated Audio Waveform & Model State Bar below Camera */
+    .camera-bottom-bar {
+      padding: 14px 20px;
+      background: #0b1120;
+      border-top: 1px solid var(--border);
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .state-row {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .waveform-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+    #waveformCanvas {
+      width: 240px;
+      height: 38px;
+      background: #050811;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
     }
     .status-badge {
       font-family: var(--mono);
       font-size: 12px;
       font-weight: 800;
-      padding: 5px 12px;
+      padding: 7px 14px;
       border-radius: 999px;
-      letter-spacing: 0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
     }
     .status-idle {
-      background: rgba(16, 185, 129, 0.15);
+      background: rgba(16, 185, 129, 0.14);
       color: #34d399;
       border: 1px solid #10b981;
     }
     .status-in-progress {
-      background: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.22);
       color: #fbbf24;
       border: 1px solid #f59e0b;
       animation: pulseGlow 1.4s infinite;
     }
     @keyframes pulseGlow {
       0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-      50% { box-shadow: 0 0 14px 4px rgba(245, 158, 11, 0.35); }
-    }
-    #waveformCanvas {
-      width: 100%;
-      height: 44px;
-      background: #050a14;
-      border-radius: 8px;
-      border: 1px solid #1e293b;
+      50% { box-shadow: 0 0 16px 4px rgba(245, 158, 11, 0.35); }
     }
 
-    /* English Talking Script & Live Transcript */
-    .conversation-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 14px;
+    /* Clean Tabbed Bottom Card on Left Column */
+    .tabbed-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 16px;
     }
-    .chat-transcript {
-      max-height: 145px;
-      overflow-y: auto;
-      background: #060b16;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .msg-user {
-      color: #93c5fd;
-      border-left: 3px solid #3b82f6;
-      padding-left: 8px;
-    }
-    .msg-gemini {
-      color: #fde68a;
-      border-left: 3px solid #f59e0b;
-      padding-left: 8px;
-    }
-    .input-row {
+    .tabs-nav {
       display: flex;
       gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
     }
-    .input-row input {
-      flex: 1;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: white;
-      padding: 9px 12px;
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      padding: 8px 14px;
       border-radius: 8px;
       font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
     }
+    .tab-btn.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: #334155;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* Live Database CRM & EU261 Cards */
-    .crm-cards-grid {
+    /* Resolution Summary Cards */
+    .summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 16px;
+      margin-bottom: 16px;
     }
-    .crm-card {
-      background: #111c33;
-      border: 1px solid #263859;
-      border-radius: 10px;
-      padding: 12px;
+    .info-box {
+      background: var(--bg-elevated);
+      border: 1px solid #263554;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .info-box h4 {
+      margin: 0 0 12px 0;
       font-size: 12px;
-    }
-    .crm-card h4 {
-      margin: 0 0 8px 0;
-      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.7px;
       color: #38bdf8;
     }
-    .crm-kv {
+    .kv-line {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 5px;
-      border-bottom: 1px dashed rgba(148, 163, 184, 0.15);
-      padding-bottom: 4px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 13px;
     }
-    .crm-kv span:first-child { color: #94a3b8; }
-    .crm-kv span:last-child { font-weight: 700; font-family: var(--mono); }
+    .kv-line:last-child { border-bottom: none; }
+    .kv-line span:first-child { color: var(--text-secondary); }
+    .kv-line span:last-child { font-weight: 700; font-family: var(--mono); }
 
-    /* Right Pane: Extended Thinking Terminal */
+    .chat-box {
+      max-height: 150px;
+      overflow-y: auto;
+      background: #070b14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg-user { color: #93c5fd; border-left: 3px solid #3b82f6; padding-left: 10px; }
+    .msg-gemini { color: #fde68a; border-left: 3px solid #f59e0b; padding-left: 10px; }
+
+    /* Right Column: Spacious Extended Thinking Terminal */
+    .terminal-card {
+      background: #050811;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 118px);
+      position: sticky;
+      top: 94px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
     .terminal-header {
-      padding: 12px 16px;
-      background: #0b1324;
-      border-bottom: 1px solid var(--panel-border);
+      padding: 16px 20px;
+      background: #0b1120;
+      border-bottom: 1px solid var(--border);
+      border-radius: 16px 16px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .terminal-title {
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
-      color: #f8fafc;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
     .terminal-log {
       flex: 1;
-      padding: 14px 16px;
+      padding: 20px;
       overflow-y: auto;
       font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.55;
+      font-size: 13px;
+      line-height: 1.6;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
     .log-entry {
-      padding: 8px 10px;
-      border-radius: 6px;
+      padding: 12px 14px;
+      border-radius: 10px;
       background: rgba(15, 23, 42, 0.75);
-      border-left: 3px solid #475569;
-      word-break: break-word;
+      border-left: 4px solid #475569;
     }
-    .log-thinking { border-left-color: #a855f7; background: rgba(88, 28, 135, 0.18); color: #e9d5ff; }
-    .log-tool-call { border-left-color: #f59e0b; background: rgba(120, 53, 15, 0.22); color: #fde68a; }
-    .log-tool-res { border-left-color: #10b981; background: rgba(6, 78, 59, 0.22); color: #a7f3d0; }
-    .log-status { border-left-color: #38bdf8; background: rgba(12, 74, 110, 0.25); color: #bae6fd; }
-    .log-filler { border-left-color: #ec4899; background: rgba(131, 24, 67, 0.2); color: #fbcfe8; }
+    .log-thinking { border-left-color: #a855f7; background: rgba(88, 28, 135, 0.16); color: #e9d5ff; }
+    .log-tool-call { border-left-color: #f59e0b; background: rgba(120, 53, 15, 0.2); color: #fde68a; }
+    .log-tool-res { border-left-color: #10b981; background: rgba(6, 78, 59, 0.2); color: #a7f3d0; }
+    .log-status { border-left-color: #38bdf8; background: rgba(12, 74, 110, 0.22); color: #bae6fd; }
+    .log-filler { border-left-color: #ec4899; background: rgba(131, 24, 67, 0.18); color: #fbcfe8; }
     .log-time {
       color: #64748b;
-      font-size: 10px;
-      margin-right: 8px;
+      font-size: 11px;
+      margin-right: 10px;
+    }
+    details {
+      margin-top: 8px;
+      background: rgba(2, 6, 23, 0.6);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    summary {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <span class="brand-badge">GEMINI 3.8 LIVE EXTENDED THINKING</span>
-      <div>
-        <h1>Tier-3 Enterprise Contact Center Concierge</h1>
-        <span>Live Camera Video Input (realtimeInput.video) • Spoken Fillers • Real Database Backend (BigQuery + Firestore + SQL)</span>
+      <span class="brand-pill">GEMINI 3.8 LIVE EXTENDED THINKING</span>
+      <div class="brand-title">
+        <h1>Enterprise Contact Center Concierge</h1>
+        <p>Live Camera Video Stream (1 FPS) • Spoken Fillers • Real Database Backend (BigQuery + Firestore + SQL)</p>
       </div>
     </div>
-    <div class="controls-top">
+    <div class="header-actions">
       <select id="thinkingLevelSelect">
         <option value="HIGH" selected>thinkingLevel: HIGH</option>
         <option value="MEDIUM">thinkingLevel: MEDIUM</option>
         <option value="LOW">thinkingLevel: LOW</option>
       </select>
-      <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">🖨️ Print Boarding Pass & Hotel Receipt</a>
+      <button class="btn" id="micBtn" onclick="toggleMic()" disabled>🎙️ Mute Mic</button>
+      <button class="btn btn-emerald" onclick="sendSingleVideoFrameNow()">📸 Snap Frame Now</button>
+      <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">🖨️ Print Boarding Pass</a>
       <button id="startSessionBtn" class="btn btn-primary" onclick="toggleLiveSession()">
         ⚡ Start Live Camera & Voice Session
       </button>
     </div>
   </header>
 
-  <div class="split-layout">
-    <!-- LEFT PANE: LIVE WEBCAM STREAM + AUDIO WAVEFORM + ENGLISH SCRIPT + DATABASE LEDGER -->
-    <div class="pane-left">
-      <!-- 1. REAL CAMERA STREAM VIEWPORT -->
-      <div class="video-stage-card">
-        <div class="stage-header">
-          <span>📹 LIVE CAMERA STREAM — Hold Up Your Printed Boarding Pass (`realtimeInput.video` @ 1 FPS)</span>
-          <span id="frameCounterBadge" style="font-family:var(--mono); color:#38bdf8;">Video Frames Streamed: 0</span>
-        </div>
-        <div class="video-viewport">
+  <main class="workspace">
+    <!-- LEFT COLUMN: HERO CAMERA + CLEAN TABS -->
+    <div class="left-column">
+      <section class="camera-card">
+        <div class="camera-viewport">
           <video id="webcamVideo" autoplay playsinline muted></video>
           <canvas id="captureCanvas" width="960" height="540"></canvas>
-          <div class="camera-overlay-pill" id="cameraStatePill">
-            CAMERA: STANDBY — Click "Start Live Camera & Voice Session"
-          </div>
-          <div class="camera-guide-frame">
-            Hold Printed Boarding Pass (PNR: LH8942X / Tag: 0220-774910-PRIO) Inside Frame While Speaking
-          </div>
-        </div>
-        <div class="camera-toolbar">
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn" id="cameraBtn" onclick="startOrStopCamera()">📷 Toggle Camera</button>
-            <button class="btn" id="micBtn" onclick="toggleMic()" disabled>🎙️ Mute / Unmute Mic</button>
-            <button class="btn btn-emerald" onclick="sendSingleVideoFrameNow()">📸 Capture & Send High-Res Frame Now</button>
-          </div>
-          <span style="font-size:11px; color:#94a3b8; font-family:var(--mono);">Stream: 16kHz PCM Audio + JPEG Video</span>
-        </div>
-      </div>
 
-      <!-- 2. AUDIO WAVEFORM + INTERACTION_STATUS INDICATOR -->
-      <div class="waveform-state-card">
-        <div class="state-row">
-          <div>
-            <div style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">
-              Audio Waveform & Spoken Filler Telemetry
-            </div>
-            <div id="audioStateLabel" style="font-size:13px; font-weight:600; color:#e2e8f0; margin-top:2px;">
-              Ready — Start session to stream live camera video & voice
-            </div>
-          </div>
-          <div>
-            <span style="font-size:11px; color:#94a3b8; margin-right:6px;">interaction_status:</span>
-            <span id="interactionStatusBadge" class="status-badge status-idle">
-              ● IDLE (WAITING FOR INPUT)
+          <div class="camera-top-hud">
+            <span class="hud-pill" id="cameraStatePill">
+              CAMERA STANDBY — Click "Start Live Camera & Voice Session"
+            </span>
+            <span class="hud-pill" id="frameCounterBadge">
+              Frames Streamed: 0
             </span>
           </div>
-        </div>
-        <canvas id="waveformCanvas" width="680" height="44"></canvas>
-      </div>
 
-      <!-- 3. ENGLISH TALKING SCRIPT TELEPROMPTER & TRANSCRIPT -->
-      <div class="conversation-card">
-        <div style="background:#0b1528; border:1px solid #1e3a8a; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.55; color:#e2e8f0;">
-          <div style="font-weight:800; color:#38bdf8; margin-bottom:4px;">
-            🎙️ LIVE ENGLISH TALKING SCRIPT (Hold Printed Boarding Pass to Camera & Speak):
-          </div>
-          <div>
-            <strong>1. You (Hold Boarding Pass to Camera):</strong>
-            <em>"My connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and claim slip on camera (PNR LH8942X, Bag Tag 0220-774910-PRIO). Can you verify my compensation entitlement and rebook me on the next Star Alliance partner flight to New York?"</em>
-          </div>
-          <div style="margin-top:6px;">
-            <strong>2. You (Reply While Aria Speaks Her Filler):</strong>
-            <em>"I prefer the Morning departure on Lufthansa LH400 at 08:30 with Business Window Seat 04A, and here is my €245 Sheraton Frankfurt Airport hotel receipt."</em>
+          <div class="scan-reticle">
+            Hold Printed Boarding Pass (PNR: LH8942X • Bag Tag: 0220-774910-PRIO) Here While Speaking
           </div>
         </div>
 
-        <div class="chat-transcript" id="transcriptBox">
-          <div class="msg-gemini">
-            <strong>[System Ready]:</strong> Click <strong>"⚡ Start Live Camera & Voice Session"</strong> at the top right. Your camera and microphone will activate automatically so you can hold up your printed boarding pass and speak naturally.
+        <div class="camera-bottom-bar">
+          <div class="waveform-wrap">
+            <canvas id="waveformCanvas" width="240" height="38"></canvas>
+            <div>
+              <div style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">
+                Voice & Filler Stream
+              </div>
+              <div id="audioStateLabel" style="font-size:13px; font-weight:600; color:var(--text-primary);">
+                Ready — Start session to enable camera & microphone
+              </div>
+            </div>
+          </div>
+          <span id="interactionStatusBadge" class="status-badge status-idle">
+            ● IDLE
+          </span>
+        </div>
+      </section>
+
+      <!-- TABBED LOWER PANEL (Keeps screen clean and uncramped) -->
+      <section class="tabbed-card">
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('summary', this)">
+            💬 Live CRM Summary & Transcript
+          </button>
+          <button class="tab-btn" onclick="switchTab('script', this)">
+            🎙️ English Talking Script (2 Steps)
+          </button>
+        </div>
+
+        <!-- TAB 1: CRM SUMMARY & LIVE TRANSCRIPT -->
+        <div id="tab-summary" class="tab-panel active">
+          <div class="summary-grid">
+            <div class="info-box">
+              <h4>🗄️ Passenger & WorldTracer (`pnr_baggage_records`)</h4>
+              <div class="kv-line"><span>Passenger:</span><span id="crmPassenger">Waiting for scan...</span></div>
+              <div class="kv-line"><span>PNR / Flight:</span><span id="crmPnr">—</span></div>
+              <div class="kv-line"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">—</span></div>
+              <div class="kv-line"><span>Vault Location:</span><span id="crmBagLoc">—</span></div>
+            </div>
+            <div class="info-box">
+              <h4>⚖️ EU261 & VIP Compensation (`eu261_policy_rules`)</h4>
+              <div class="kv-line"><span>EU261 Art. 7 (€600 Cash):</span><span id="crmArt7" style="color:#f87171;">—</span></div>
+              <div class="kv-line"><span>EU261 Art. 9 (Hotel/Care):</span><span id="crmArt9" style="color:#34d399;">—</span></div>
+              <div class="kv-line"><span>VIP 1K Goodwill Override:</span><span id="crmVip" style="color:#38bdf8;">—</span></div>
+              <div class="kv-line"><span>Rebooked Transaction:</span><span id="crmRebooked" style="color:#a7f3d0;">—</span></div>
+            </div>
+          </div>
+
+          <div class="chat-box" id="transcriptBox">
+            <div class="msg-gemini">
+              <strong>[Concierge Ready]:</strong> Click <strong>"⚡ Start Live Camera & Voice Session"</strong> at the top right, hold your printed boarding pass up to the camera, and speak naturally.
+            </div>
           </div>
         </div>
 
-        <div class="input-row">
-          <input
-            type="text"
-            id="manualTextInput"
-            placeholder="Optional: Type an utterance if testing without a microphone..."
-            onkeydown="if(event.key==='Enter') sendManualText()"
-          />
-          <button class="btn btn-primary" onclick="sendManualText()">Send Turn</button>
+        <!-- TAB 2: SPACIOUS TALKING SCRIPT -->
+        <div id="tab-script" class="tab-panel">
+          <div style="display:flex; flex-direction:column; gap:14px; font-size:14px; line-height:1.6;">
+            <div class="info-box" style="border-left:4px solid #3b82f6;">
+              <h4 style="color:#60a5fa;">Step 1 — Hold Boarding Pass to Camera & Speak</h4>
+              "Hi Aria, my connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and claim slip on camera — PNR LH8942X, Bag Tag 0220-774910-PRIO. Can you verify my compensation entitlement and rebook me on the next Star Alliance partner flight to New York?"
+            </div>
+            <div class="info-box" style="border-left:4px solid #10b981;">
+              <h4 style="color:#34d399;">Step 2 — Reply While Aria Speaks Her Filler</h4>
+              "I prefer the morning departure on Lufthansa flight LH400 at 08:30 AM with Business Window Seat 04A, and here is my €245 Sheraton Frankfurt Airport hotel receipt."
+            </div>
+          </div>
         </div>
-      </div>
-
-      <!-- 4. LIVE DATABASE STATE & EU261 RESOLUTION LEDGER -->
-      <div class="crm-cards-grid">
-        <div class="crm-card">
-          <h4>🗄️ Database Record (`pnr_baggage_records`)</h4>
-          <div class="crm-kv"><span>Passenger:</span><span id="crmPassenger">Awaiting Camera OCR / DB Query...</span></div>
-          <div class="crm-kv"><span>PNR / Disrupted:</span><span id="crmPnr">—</span></div>
-          <div class="crm-kv"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">—</span></div>
-          <div class="crm-kv"><span>Bag Vault Status:</span><span id="crmBagLoc">—</span></div>
-        </div>
-        <div class="crm-card">
-          <h4>⚖️ EU261 Policy & Rebooking Transaction</h4>
-          <div class="crm-kv"><span>EU261 Art. 7 (€600 Cash):</span><span id="crmArt7" style="color:#f87171;">—</span></div>
-          <div class="crm-kv"><span>EU261 Art. 9 (Hotel/Care):</span><span id="crmArt9" style="color:#34d399;">—</span></div>
-          <div class="crm-kv"><span>VIP 1K Goodwill Override:</span><span id="crmVip" style="color:#38bdf8;">—</span></div>
-          <div class="crm-kv"><span>DB Transaction / Flight:</span><span id="crmRebooked" style="color:#a7f3d0;">—</span></div>
-        </div>
-      </div>
+      </section>
     </div>
 
-    <!-- RIGHT PANE: BACKGROUND AGENT REASONING & DATABASE SQL TERMINAL -->
-    <div class="pane-right">
+    <!-- RIGHT COLUMN: SPACIOUS EXTENDED THINKING & SQL TERMINAL -->
+    <aside class="terminal-card">
       <div class="terminal-header">
         <div class="terminal-title">
-          <span>🧠 Background Agent Reasoning & Database SQL Execution Terminal</span>
+          <span>🧠 Extended Thinking & NON_BLOCKING Database Log</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <span style="font-family:var(--mono); font-size:11px; background:#1e293b; padding:4px 8px; border-radius:6px; color:#c084fc;">
-            behavior: "NON_BLOCKING"
-          </span>
-          <a class="btn" style="padding:4px 8px; font-size:11px;" href="/api/db-state" target="_blank">Inspect Live DB JSON</a>
-          <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="clearTerminal()">Clear</button>
+        <div style="display:flex; gap:8px;">
+          <a class="btn" style="padding:6px 10px; font-size:11px;" href="/api/db-state" target="_blank">View DB Tables</a>
+          <button class="btn" style="padding:6px 10px; font-size:11px;" onclick="clearTerminal()">Clear</button>
         </div>
       </div>
       <div class="terminal-log" id="thinkingTerminal">
         <div class="log-entry log-status">
-          <span class="log-time">[BOOT]</span>
-          <strong>Gemini 3.8 Live Extended Thinking + Real SQL/Firestore Backend Initialized.</strong><br/>
-          Continuous 1 FPS Camera JPEG frames (<code>realtimeInput.video</code>) + 16kHz PCM Mic Audio (<code>realtimeInput.audio</code>) ready.
+          <span class="log-time">[READY]</span>
+          <strong>Gemini 3.8 Live Extended Thinking Telemetry Active.</strong><br/>
+          Monitoring <code>interaction_status</code> (<code>IN_PROGRESS</code> ➔ <code>IDLE</code>), spoken conversational fillers, and asynchronous <code>NON_BLOCKING</code> SQL & Firestore execution.
         </div>
       </div>
-    </div>
-  </div>
+    </aside>
+  </main>
 
   <script>
     let ws = null;
@@ -537,30 +551,27 @@
     const captureCanvas = document.getElementById('captureCanvas');
     const captureCtx = captureCanvas.getContext('2d');
 
-    // Fallback image if running on a headless machine without a physical camera
     const fallbackSlipImage = new Image();
     fallbackSlipImage.src = '/samples/sample-fra-boarding-pass-slip.jpg';
 
-    async function startOrStopCamera() {
+    function switchTab(tabId, btnEl) {
+      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      btnEl.classList.add('active');
+    }
+
+    async function startCamera() {
       const pill = document.getElementById('cameraStatePill');
-      if (webcamStream) {
-        webcamStream.getTracks().forEach((t) => t.stop());
-        webcamStream = null;
-        webcamVideo.srcObject = null;
-        pill.textContent = 'CAMERA: STOPPED';
-        return false;
-      }
       try {
         webcamStream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
         });
         webcamVideo.srcObject = webcamStream;
-        pill.textContent = '🟢 LIVE CAMERA STREAMING (1 FPS JPEG -> gemini-3.8-live-extended-thinking)';
-        logToTerminal('log-status', 'Live Webcam activated. Hold your printed boarding pass up to the camera.');
+        pill.textContent = '🟢 LIVE CAMERA STREAMING (1 FPS JPEG)';
         return true;
       } catch (err) {
-        pill.textContent = '⚠️ WEBCAM UNAVAILABLE — Using Sample Boarding Pass Stream';
-        logToTerminal('log-tool-call', `Camera access note (${err.message}). Falling back to sample boarding pass image frame.`);
+        pill.textContent = '⚠️ WEBCAM FALLBACK ACTIVE';
         return false;
       }
     }
@@ -591,17 +602,17 @@
       );
 
       framesSentCount++;
-      document.getElementById('frameCounterBadge').textContent = `Video Frames Streamed: ${framesSentCount}`;
+      document.getElementById('frameCounterBadge').textContent = `Frames Streamed: ${framesSentCount}`;
     }
 
     function setInteractionStatus(status) {
       const badge = document.getElementById('interactionStatusBadge');
       if (status === 'IN_PROGRESS') {
         badge.className = 'status-badge status-in-progress';
-        badge.innerHTML = '⚡ IN_PROGRESS (SPEAKING FILLER + RUNNING DB QUERIES)';
+        badge.innerHTML = '⚡ IN_PROGRESS (THINKING & DB TOOLS)';
       } else if (status === 'IDLE') {
         badge.className = 'status-badge status-idle';
-        badge.innerHTML = '● IDLE (SYNTHESIS COMPLETE / LISTENING)';
+        badge.innerHTML = '● IDLE';
       }
     }
 
@@ -626,7 +637,7 @@
       const box = document.getElementById('transcriptBox');
       const div = document.createElement('div');
       div.className = speaker === 'user' ? 'msg-user' : 'msg-gemini';
-      div.innerHTML = `<strong>${speaker === 'user' ? 'Passenger (You)' : 'Concierge (Aria)'}:</strong> ${text}`;
+      div.innerHTML = `<strong>${speaker === 'user' ? 'You' : 'Aria'}:</strong> ${text}`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
@@ -668,27 +679,24 @@
       nextPlayTime += buffer.duration;
 
       isModelSpeaking = true;
-      document.getElementById('audioStateLabel').textContent =
-        '🔊 Streaming 24kHz Native Audio (Spoken Filler / Synthesis Active)...';
+      document.getElementById('audioStateLabel').textContent = '🔊 Aria Speaking (24kHz Native Audio)...';
       source.onended = () => {
         if (audioCtx.currentTime >= nextPlayTime - 0.05) {
           isModelSpeaking = false;
-          document.getElementById('audioStateLabel').textContent =
-            '🎙️ Live Mic + Camera Active — Hold up your printed boarding pass and speak...';
+          document.getElementById('audioStateLabel').textContent = '🎙️ Listening — Hold boarding pass to camera & speak';
         }
       };
     }
 
-    // Animated Audio Waveform
     const waveCanvas = document.getElementById('waveformCanvas');
     const waveCtx = waveCanvas.getContext('2d');
     function drawWaveform() {
       waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
-      const barCount = 56;
+      const barCount = 32;
       const barWidth = (waveCanvas.width - barCount * 3) / barCount;
       for (let i = 0; i < barCount; i++) {
         const activeAmp = isModelSpeaking
-          ? Math.max(6, Math.sin(Date.now() / 75 + i * 0.45) * 18 + Math.random() * 16)
+          ? Math.max(6, Math.sin(Date.now() / 75 + i * 0.45) * 15 + Math.random() * 14)
           : 4 + Math.sin(Date.now() / 300 + i * 0.2) * 2;
         const x = i * (barWidth + 3);
         const y = (waveCanvas.height - activeAmp) / 2;
@@ -710,12 +718,8 @@
       }
 
       await ensureAudioContext();
-      if (!webcamStream) {
-        await startOrStopCamera();
-      }
-      if (!micStream) {
-        await startMicCapture();
-      }
+      if (!webcamStream) await startCamera();
+      if (!micStream) await startMicCapture();
 
       const thinkingLevel = document.getElementById('thinkingLevelSelect').value;
       const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -723,16 +727,15 @@
 
       ws.onopen = () => {
         isConnected = true;
-        btn.textContent = '🛑 Stop Live Session';
+        btn.textContent = '🛑 Stop Session';
         btn.className = 'btn btn-danger';
         micBtn.disabled = false;
 
         logToTerminal(
           'log-status',
-          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> (<code>thinkingLevel: "${thinkingLevel}"</code>). Streaming live camera JPEG frames @ 1 FPS via <code>realtimeInput.video</code>.`
+          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> (<code>thinkingLevel: "${thinkingLevel}"</code>). Streaming live camera JPEG frames @ 1 FPS.`
         );
 
-        // Stream live camera video frames every 1000ms (1 FPS as recommended by Gemini Live API docs)
         sendSingleVideoFrameNow();
         videoStreamInterval = setInterval(sendSingleVideoFrameNow, 1000);
       };
@@ -740,33 +743,23 @@
       ws.onmessage = (evt) => {
         const data = JSON.parse(evt.data);
 
-        if (data.type === 'session_init') {
-          logToTerminal(
-            'log-thinking',
-            `-> [Session Setup]: Model=<code>${data.model}</code> | Thinking=<code>${data.thinkingLevel}</code> | NON_BLOCKING DB Tools=<code>[${data.tools.join(', ')}]</code>`
-          );
-          return;
-        }
-
         if (data.type === 'tool_execution_start') {
           setInteractionStatus('IN_PROGRESS');
           logToTerminal(
             'log-tool-call',
-            `-> <strong>[Tool Call: NON_BLOCKING]</strong>: <code>${data.name}(${JSON.stringify(data.args)})</code><br/><span style="color:#fbbf24;">interaction_status="IN_PROGRESS" — Executing database query while voice conversation continues...</span>`
+            `-> <strong>[Tool Call: NON_BLOCKING]</strong>: <code>${data.name}(${JSON.stringify(data.args)})</code>`
           );
           return;
         }
 
         if (data.type === 'tool_execution_complete') {
-          const sqlText = data.result.sql_executed
-            ? `<div style="color:#93c5fd; margin-top:4px;"><strong>SQL Executed:</strong> <code>${data.result.sql_executed}</code></div>`
-            : '';
-          const dbEngineText = data.result.database_engine
-            ? `<div style="color:#c084fc;"><strong>Database Engine:</strong> ${data.result.database_engine}</div>`
+          const sqlLine = data.result.sql_executed
+            ? `<div style="color:#93c5fd; margin-top:4px; font-size:11px;"><code>${data.result.sql_executed}</code></div>`
             : '';
           logToTerminal(
             'log-tool-res',
-            `-> <strong>[Database Result: ${data.result.status}]</strong>: <code>${data.name}</code> (${data.result._execution_time_ms}ms)${dbEngineText}${sqlText}<pre style="margin:4px 0 0 0; font-size:10px; color:#d1fae5; white-space:pre-wrap;">${JSON.stringify(data.result, null, 2)}</pre>`
+            `-> <strong>[DB Result: ${data.result.status}]</strong>: <code>${data.name}</code> (${data.result._execution_time_ms}ms)${sqlLine}
+            <details><summary>Inspect Returned Database Record</summary><pre style="margin:6px 0 0 0; font-size:11px; color:#d1fae5; white-space:pre-wrap;">${JSON.stringify(data.result, null, 2)}</pre></details>`
           );
           updateCrmUiFromTool(data.name, data.result);
           return;
@@ -777,9 +770,7 @@
             setInteractionStatus(data.interactionStatus);
             logToTerminal(
               'log-status',
-              `-> <strong>[Lifecycle Signal]</strong>: <code>interaction_status = "${data.interactionStatus}"</code> ${
-                data.message.serverContent?.turnComplete ? '(turnComplete: true)' : ''
-              }`
+              `-> <strong>[State]</strong>: <code>interaction_status = "${data.interactionStatus}"</code>`
             );
           }
 
@@ -790,7 +781,7 @@
               if (part.thought || part.text) {
                 logToTerminal(
                   'log-thinking',
-                  `-> <strong>[Thinking (${document.getElementById('thinkingLevelSelect').value})]</strong>: ${part.text}`
+                  `-> <strong>[Thinking]</strong>: ${part.text}`
                 );
               }
               const inline = part.inlineData || part.inline_data;
@@ -803,7 +794,7 @@
             if (outTr?.text) {
               appendTranscript('gemini', outTr.text);
               if (data.interactionStatus === 'IN_PROGRESS') {
-                logToTerminal('log-filler', `-> <strong>[Spoken Filler While Thinking]</strong>: "${outTr.text}"`);
+                logToTerminal('log-filler', `-> <strong>[Spoken Filler]</strong>: "${outTr.text}"`);
               }
             }
 
@@ -821,7 +812,6 @@
         btn.textContent = '⚡ Start Live Camera & Voice Session';
         btn.className = 'btn btn-primary';
         setInteractionStatus('IDLE');
-        logToTerminal('log-status', 'Live session closed.');
       };
     }
 
@@ -833,13 +823,13 @@
         document.getElementById('crmBagLoc').textContent = res.worldtracer_baggage.current_location;
       }
       if (name === 'evaluate_eu261_and_vip_entitlement' && res.legal_and_policy_determination) {
-        document.getElementById('crmArt7').textContent = 'EXEMPT (Art. 5(3) WX84 Weather)';
+        document.getElementById('crmArt7').textContent = 'EXEMPT (Art. 5(3) Weather)';
         document.getElementById('crmArt9').textContent = 'APPROVED (€245 Hotel + €45 Meals)';
-        document.getElementById('crmVip').textContent = '$350 Goodwill + 25,000 Miles + Lounge';
+        document.getElementById('crmVip').textContent = '$350 Goodwill + 25,000 Miles';
       }
       if (name === 'issue_rebooking_and_compensation_package' && res.rebooked_itinerary) {
         document.getElementById('crmRebooked').textContent =
-          `${res.database_transaction_id} • ${res.rebooked_itinerary.flight_number} (${res.rebooked_itinerary.confirmed_seat})`;
+          `${res.database_transaction_id} • ${res.rebooked_itinerary.flight_number}`;
       }
     }
 
@@ -876,7 +866,6 @@
         };
         source.connect(micProcessor);
         micProcessor.connect(micCtx.destination);
-        logToTerminal('log-status', 'Microphone active (16kHz PCM with echo cancellation).');
       } catch (err) {
         logToTerminal('log-tool-call', `Microphone note: ${err.message}`);
       }
@@ -885,22 +874,6 @@
     function toggleMic() {
       micMuted = !micMuted;
       document.getElementById('micBtn').textContent = micMuted ? '🔇 Unmute Mic' : '🎙️ Mute Mic';
-    }
-
-    function sendManualText() {
-      const input = document.getElementById('manualTextInput');
-      const text = input.value.trim();
-      if (!text || !isConnected) return;
-      sendSingleVideoFrameNow();
-      appendTranscript('user', text);
-      ws.send(
-        JSON.stringify({
-          realtimeInput: {
-            text
-          }
-        })
-      );
-      input.value = '';
     }
   </script>
 </body>
