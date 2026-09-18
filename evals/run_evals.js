@@ -90,7 +90,7 @@ async function runEval2_VisualOcrSampleSlips() {
   const slip2Base64 = fs.readFileSync(slip2Path).toString('base64');
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+    model: 'gemini-3.8-flash',
     contents: [
       {
         role: 'user',
@@ -240,7 +240,7 @@ async function runEval4_Eu261AndVipPolicyReasoningJudge() {
   const eu261Data = await executeCrmTool('evaluate_eu261_and_vip_entitlement', { disruption_code: 'WX84' }, 0);
 
   const synthesisResp = await ai.models.generateContent({
-    model: 'gemini-3.6-flash',
+    model: 'gemini-3.8-flash',
     config: {
       systemInstruction: CONCIERGE_SYSTEM_INSTRUCTION
     },

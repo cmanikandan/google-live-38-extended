@@ -10,7 +10,7 @@
         "toolCount": 4,
         "allNonBlocking": true
       },
-      "timestamp": "2026-09-18T05:24:34.001Z"
+      "timestamp": "2026-09-18T05:27:23.078Z"
     },
     {
       "id": "EVAL-02",
@@ -23,16 +23,16 @@
         "hasPir": true,
         "hasHotel": true
       },
-      "timestamp": "2026-09-18T05:24:44.287Z"
+      "timestamp": "2026-09-18T05:27:31.320Z"
     },
     {
       "id": "EVAL-03",
       "name": "Gemini 3.8 Live Extended Thinking WebSocket Protocol, Video Frame & NON_BLOCKING Tool Lifecycle",
       "passed": true,
-      "details": "SessionInit=true, AudioChunks=61, ToolsCalled=[scan_boarding_pass_and_bag_tag, search_star_alliance_partner_flights, evaluate_eu261_and_vip_entitlement], sawInProgress=true, sawIdle=false.",
+      "details": "SessionInit=true, AudioChunks=60, ToolsCalled=[scan_boarding_pass_and_bag_tag, search_star_alliance_partner_flights, evaluate_eu261_and_vip_entitlement], sawInProgress=true, sawIdle=false.",
       "metrics": {
         "sessionInitialized": true,
-        "audioChunksReceived": 61,
+        "audioChunksReceived": 60,
         "toolsTriggered": [
           "scan_boarding_pass_and_bag_tag",
           "search_star_alliance_partner_flights",
@@ -41,7 +41,7 @@
         "sawInProgressStatus": true,
         "sawIdleStatus": false
       },
-      "timestamp": "2026-09-18T05:25:08.290Z"
+      "timestamp": "2026-09-18T05:27:55.323Z"
     },
     {
       "id": "EVAL-04",
@@ -54,7 +54,7 @@
         "vip_goodwill_350_and_bag": true,
         "morning_flight_lh400": true
       },
-      "timestamp": "2026-09-18T05:25:17.140Z"
+      "timestamp": "2026-09-18T05:28:10.843Z"
     }
   ]
 }
