@@ -7,10 +7,14 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "eval": "node evals/run_evals.js"
+    "eval": "node evals/run_evals.js",
+    "seed:gcp": "node src/seed_gcp_backend.js"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^9.1.0",
+    "@google-cloud/firestore": "^9.2.0",
     "@google/genai": "^1.0.0",
+    "better-sqlite3": "^13.0.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "ws": "^8.18.1"

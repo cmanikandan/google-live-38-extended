@@ -9,6 +9,7 @@ import {
   executeCrmTool,
   CONCIERGE_SYSTEM_INSTRUCTION
 } from './src/crm_tools.js';
+import { getDatabaseSnapshot } from './src/database_backend.js';
 
 dotenv.config();
 
@@ -26,15 +27,26 @@ app.get('/api/health', (req, res) => {
   const hasServerKey = Boolean(
     process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here'
   );
+  const dbSnapshot = getDatabaseSnapshot();
   res.json({
     status: 'ok',
     model: DEFAULT_MODEL,
     hasServerApiKey: hasServerKey,
+    databaseBackend: {
+      gcpProjectId: dbSnapshot.gcpProjectId,
+      bigQueryDataset: dbSnapshot.bigQueryDataset,
+      cloudAdcConnected: dbSnapshot.cloudAdcConnected,
+      sqliteFile: dbSnapshot.sqliteFile
+    },
     toolsRegistered: NON_BLOCKING_TOOL_DECLARATIONS.map((t) => ({
       name: t.name,
       behavior: t.behavior
     }))
   });
+});
+
+app.get('/api/db-state', (req, res) => {
+  res.json(getDatabaseSnapshot());
 });
 
 app.post('/api/execute-tool', async (req, res) => {

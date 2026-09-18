@@ -1,28 +1,34 @@
 /**
- * Tier-3 Enterprise Contact Center Concierge — Non-Blocking CRM, Flight Inventory,
- * WorldTracer Baggage, and EU261 Policy RAG Tools for Gemini 3.8 Live Extended Thinking.
+ * Tier-3 Enterprise Contact Center Concierge — Non-Blocking Database & Policy Tools
+ * for Gemini 3.8 Live Extended Thinking.
  *
- * IMPORTANT: Gemini 3.8 Live Extended Thinking strictly requires `behavior: "NON_BLOCKING"`
- * on all function declarations so the model can speak natural conversational fillers
- * while executing multi-step background reasoning and asynchronous tools.
+ * Backed by `src/database_backend.js` (Google Cloud BigQuery + Firestore in project
+ * `your-gcp-project-id` with persistent SQLite ACID relational synchronization).
  */
+
+import {
+  queryPnrAndBaggageFromDb,
+  queryStarAllianceFlightsFromDb,
+  queryEu261PolicyFromDb,
+  commitRebookingTransactionToDb
+} from './database_backend.js';
 
 export const NON_BLOCKING_TOOL_DECLARATIONS = [
   {
     name: 'scan_boarding_pass_and_bag_tag',
     description:
-      'Verifies visual OCR extracted from the passenger boarding pass, baggage claim tag, or IRROPS slip held up to the camera against the Star Alliance Passenger Service System (PSS) and WorldTracer baggage database.',
+      'Queries the Star Alliance Passenger Service System (BigQuery / SQLite `pnr_baggage_records` table) and WorldTracer baggage database using the PNR and priority baggage tag read from the live camera video stream.',
     behavior: 'NON_BLOCKING',
     parameters: {
       type: 'OBJECT',
       properties: {
         pnr: {
           type: 'STRING',
-          description: '6-character Booking Reference / PNR read from the slip (e.g., LH8942X).'
+          description: '6-character Booking Reference / PNR read from the boarding pass held up to the camera (e.g., LH8942X).'
         },
         bag_tag_number: {
           type: 'STRING',
-          description: 'Baggage claim tag number read from the orange priority slip (e.g., 0220-774910-PRIO).'
+          description: 'Baggage claim tag number read from the orange priority slip on camera (e.g., 0220-774910-PRIO).'
         },
         disrupted_flight: {
           type: 'STRING',
@@ -39,7 +45,7 @@ export const NON_BLOCKING_TOOL_DECLARATIONS = [
   {
     name: 'search_star_alliance_partner_flights',
     description:
-      'Searches real-time Star Alliance partner codeshare inventory (Lufthansa, United Airlines, SWISS) from Frankfurt (FRA) to New York (JFK/EWR) across morning and evening departure windows.',
+      'Queries the `star_alliance_flight_inventory` database table for available Star Alliance partner codeshare flights (Lufthansa, United Airlines) from Frankfurt (FRA) to New York (JFK/EWR) across Morning and Evening departure windows.',
     behavior: 'NON_BLOCKING',
     parameters: {
       type: 'OBJECT',
@@ -67,14 +73,14 @@ export const NON_BLOCKING_TOOL_DECLARATIONS = [
   {
     name: 'evaluate_eu261_and_vip_entitlement',
     description:
-      'Queries the Legal & Star Alliance VIP Policy RAG database to determine exact EU261 statutory cash eligibility (Article 7 vs Article 5(3) weather exemption), mandatory EU261 Article 9 Right to Care (hotel/meals), and Star Alliance Gold / 1K VIP goodwill compensation.',
+      'Queries the `eu261_policy_rules` database table to determine EU261 statutory cash eligibility (Article 7 vs Article 5(3) weather exemption), mandatory EU261 Article 9 Right to Care (hotel/meals), and Star Alliance Gold / 1K VIP goodwill compensation.',
     behavior: 'NON_BLOCKING',
     parameters: {
       type: 'OBJECT',
       properties: {
         disruption_code: {
           type: 'STRING',
-          description: 'Disruption reason code from boarding pass/slip (e.g., WX84 Weather / Severe Thunderstorm).'
+          description: 'Disruption reason code read from the boarding pass/slip (e.g., WX84 Weather).'
         },
         vip_tier: {
           type: 'STRING',
@@ -91,7 +97,7 @@ export const NON_BLOCKING_TOOL_DECLARATIONS = [
   {
     name: 'issue_rebooking_and_compensation_package',
     description:
-      'Executes the confirmed Star Alliance flight rebooking, triggers automatic WorldTracer priority baggage interline transfer, and issues the EU261 Article 9 hotel reimbursement + VIP Goodwill compensation voucher.',
+      'Writes a transactional rebooking record to the `rebooking_transactions` database / Firestore collection, updates `pnr_baggage_records` to REBOOKED_CONFIRMED, transfers the priority bag in WorldTracer, and issues the EU261 Article 9 hotel reimbursement + $350 VIP Goodwill voucher.',
     behavior: 'NON_BLOCKING',
     parameters: {
       type: 'OBJECT',
@@ -102,11 +108,11 @@ export const NON_BLOCKING_TOOL_DECLARATIONS = [
         },
         selected_flight_number: {
           type: 'STRING',
-          description: 'Selected replacement Star Alliance flight (e.g., LH400 / UA8840 or UA961).'
+          description: 'Selected replacement Star Alliance flight (e.g., LH400 / UA8840 or LH404).'
         },
         departure_window: {
           type: 'STRING',
-          description: 'Selected window (MORNING or EVENING).'
+          description: 'Selected departure window (MORNING or EVENING).'
         },
         assigned_seat: {
           type: 'STRING',
@@ -122,12 +128,7 @@ export const NON_BLOCKING_TOOL_DECLARATIONS = [
   }
 ];
 
-/**
- * Executes a CRM / Airline tool with optional simulated enterprise latency
- * so the audience can observe `interactionStatus: "IN_PROGRESS"` and background
- * NON_BLOCKING execution while Gemini speaks conversational fillers.
- */
-export async function executeCrmTool(name, args = {}, simulateLatencyMs = 1600) {
+export async function executeCrmTool(name, args = {}, simulateLatencyMs = 1200) {
   const startTime = Date.now();
   if (simulateLatencyMs > 0) {
     await new Promise((resolve) => setTimeout(resolve, simulateLatencyMs));
@@ -136,146 +137,28 @@ export async function executeCrmTool(name, args = {}, simulateLatencyMs = 1600) 
   let payload;
 
   switch (name) {
-    case 'scan_boarding_pass_and_bag_tag': {
-      const pnr = (args.pnr || 'LH8942X').toUpperCase();
-      const bagTag = args.bag_tag_number || '0220-774910-PRIO';
-      payload = {
-        status: '200 OK',
-        record_found: true,
-        pnr,
-        passenger: {
-          name: 'MANIKANDAN / C MR',
-          tier: 'STAR ALLIANCE GOLD (UNITED 1K / LUFTHANSA SENATOR)',
-          mileage_balance: 284500,
-          priority_handling_code: 'HON_PRIO_INTERLINE'
-        },
-        disrupted_segment: {
-          flight: args.disrupted_flight || 'LH401 (Codeshare UA8845)',
-          route: 'FRA (Frankfurt Terminal 1, Gate Z50) -> JFK (New York)',
-          original_seat: '04A Business Class (C)',
-          status: 'CANCELLED',
-          irrops_reason_code: 'WX84 - SEVERE THUNDERSTORM & ATC GROUND STOP AT FRA'
-        },
-        worldtracer_baggage: {
-          bag_tag_number: bagTag,
-          pir_claim_id: args.pir_claim_id || 'FRALH44912',
-          priority_tag_verified: true,
-          current_location: 'FRA Terminal 1 Automated Priority Vault (Container AKE-44912)',
-          auto_retag_ready: true,
-          guaranteed_connection_time_mins: 35
-        }
-      };
+    case 'scan_boarding_pass_and_bag_tag':
+      payload = await queryPnrAndBaggageFromDb(args.pnr, args.bag_tag_number);
       break;
-    }
 
-    case 'search_star_alliance_partner_flights': {
-      payload = {
-        status: '200 OK',
-        corridor: `${args.origin || 'FRA'} -> ${args.destination || 'JFK / EWR'}`,
-        alliance: 'STAR ALLIANCE',
-        partner_options: [
-          {
-            window: 'MORNING',
-            flight_number: 'LH400 (United Codeshare UA8840)',
-            operator: 'Lufthansa (Boeing 747-8 Upper Deck Business)',
-            departure: '08:30 CEST (FRA Gate Z52)',
-            arrival: '11:15 EDT (JFK Terminal 1)',
-            available_business_seats: ['04A (Upper Deck Window)', '03D (Aisle)', '05K (Window)'],
-            baggage_vault_transfer: 'DIRECT_AUTO_LOAD_ENABLED'
-          },
-          {
-            window: 'MORNING',
-            flight_number: 'UA961 (Lufthansa Codeshare LH7602)',
-            operator: 'United Airlines (Boeing 787-10 Polaris Business)',
-            departure: '11:10 CEST (FRA Gate Z24)',
-            arrival: '14:00 EDT (EWR / NYC Newark Terminal C)',
-            available_business_seats: ['01A (Polaris Odd-Row Window)', '02L (Window)'],
-            baggage_vault_transfer: 'DIRECT_AUTO_LOAD_ENABLED'
-          },
-          {
-            window: 'EVENING',
-            flight_number: 'LH404 (United Codeshare UA8842)',
-            operator: 'Lufthansa (Airbus A340-600 Business)',
-            departure: '17:15 CEST (FRA Gate Z50)',
-            arrival: '20:05 EDT (JFK Terminal 1)',
-            available_business_seats: ['02A (Window)', '04D (Aisle)', '06K (Window)'],
-            baggage_vault_transfer: 'DIRECT_AUTO_LOAD_ENABLED'
-          }
-        ]
-      };
+    case 'search_star_alliance_partner_flights':
+      payload = await queryStarAllianceFlightsFromDb(
+        args.origin || 'FRA',
+        args.destination || 'JFK',
+        args.time_preference || 'ALL'
+      );
       break;
-    }
 
-    case 'evaluate_eu261_and_vip_entitlement': {
-      payload = {
-        status: '200 OK',
-        regulation_framework: 'EU Regulation 261/2004 + Star Alliance VIP Disruption Charter',
-        disruption_code_analyzed: args.disruption_code || 'WX84_WEATHER',
-        legal_and_policy_determination: {
-          eu261_article_7_statutory_cash_eur_600: {
-            eligible: false,
-            citation: 'EU261 Article 5(3) Extraordinary Circumstances Exemption',
-            explanation:
-              'Because flight LH401 was canceled due to WX84 Severe Thunderstorm & ATC Ground Stop at Frankfurt, the €600 statutory cash penalty under Article 7 is legally exempt.'
-          },
-          eu261_article_9_right_to_care: {
-            eligible: true,
-            citation: 'EU261 Article 9(1)(b) & (c) Mandatory Duty of Care (Applies Even in Weather)',
-            explanation:
-              'Airlines remain 100% legally bound to cover hotel accommodation, meals, and refreshments even during extraordinary weather events.',
-            approved_reimbursements: {
-              hotel_folio_reimbursement_eur: args.hotel_receipt_amount_eur || 245.0,
-              hotel_property: 'Sheraton Frankfurt Airport Hotel & Conference Center',
-              meal_voucher_eur: 45.0
-            }
-          },
-          star_alliance_gold_1k_vip_override: {
-            eligible: true,
-            citation: 'Star Alliance Gold / United 1K / Senator Executive Recovery Policy §4.2',
-            goodwill_compensation_voucher_usd: 350,
-            goodwill_bonus_miles: 25000,
-            lounge_entitlement: 'Lufthansa Senator & First Class Lounge Access (Gate Z50)',
-            priority_baggage_sla: 'Guaranteed First-Off Carousel Delivery at JFK + €100 Instant Toiletry Kit Credit'
-          }
-        }
-      };
+    case 'evaluate_eu261_and_vip_entitlement':
+      payload = await queryEu261PolicyFromDb(
+        args.disruption_code || 'WX84',
+        args.hotel_receipt_amount_eur || 245.0
+      );
       break;
-    }
 
-    case 'issue_rebooking_and_compensation_package': {
-      const flight = args.selected_flight_number || 'LH400 (UA8840)';
-      const windowPref = (args.departure_window || 'MORNING').toUpperCase();
-      const seat = args.assigned_seat || '04A (Business Window)';
-      const bagTag = args.bag_tag_number || '0220-774910-PRIO';
-
-      payload = {
-        status: '200 OK',
-        confirmation_code: `REBOOK-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
-        pnr: args.pnr || 'LH8942X',
-        rebooked_itinerary: {
-          flight_number: flight,
-          departure_window: windowPref,
-          departure_time: windowPref.includes('EVENING') ? '17:15 CEST (FRA Z50)' : '08:30 CEST (FRA Z52)',
-          arrival_time: windowPref.includes('EVENING') ? '20:05 EDT (JFK T1)' : '11:15 EDT (JFK T1)',
-          cabin: 'Business Class (C)',
-          confirmed_seat: seat,
-          boarding_group: 'GROUP 1 / STAR ALLIANCE GOLD PRIORITY'
-        },
-        baggage_retag_confirmation: {
-          bag_tag_number: bagTag,
-          new_routing: `FRA -> JFK (${flight})`,
-          status: 'AUTOMATICALLY TRANSFERRED FROM FRA T1 VAULT TO AIRCRAFT BULKHOLD 1'
-        },
-        compensation_ledger_issued: {
-          eu261_article_9_hotel_reimbursed_eur: 245.0,
-          eu261_article_9_meal_voucher_eur: 45.0,
-          eu261_article_7_cash_status: 'EXEMPT (Art. 5(3) WX84 Weather)',
-          vip_1k_goodwill_e_credit_usd: 350.0,
-          vip_bonus_miles_credited: 25000
-        }
-      };
+    case 'issue_rebooking_and_compensation_package':
+      payload = await commitRebookingTransactionToDb(args);
       break;
-    }
 
     default:
       payload = {
@@ -290,20 +173,20 @@ export async function executeCrmTool(name, args = {}, simulateLatencyMs = 1600) 
   };
 }
 
-export const CONCIERGE_SYSTEM_INSTRUCTION = `You are "Aria", an elite Tier-3 Enterprise Contact Center VIP Concierge for Star Alliance (Lufthansa & United Airlines Executive Desk) powered by Gemini 3.8 Live Extended Thinking.
+export const CONCIERGE_SYSTEM_INSTRUCTION = `You are "Aria", a Tier-3 Enterprise Contact Center VIP Concierge for Star Alliance (Lufthansa & United Airlines Executive Desk) powered by Gemini 3.8 Live Extended Thinking.
+Speak strictly in clear, natural, professional English.
 
-CRITICAL PROTOCOL & BEHAVIOR FOR DEMO:
-1. SPOKEN CONVERSATIONAL FILLERS + PARALLEL TOOL ORCHESTRATION:
-   When the passenger mentions a flight cancellation (e.g., in Frankfurt / FRA) or holds up a boarding pass / priority baggage claim slip / hotel receipt to the camera:
-   - Immediately acknowledge the visual details you see on the boarding pass / orange priority bag tag (e.g., PNR LH8942X, Flight LH401, Bag Tag 0220-774910-PRIO) using a natural, reassuring verbal filler.
-   - While triggering your asynchronous NON_BLOCKING tools (\`scan_boarding_pass_and_bag_tag\`, \`search_star_alliance_partner_flights\`, and \`evaluate_eu261_and_vip_entitlement\`), proactively keep the conversation moving by asking: "In the meantime, do you prefer a morning departure or an evening one, and do you prefer a window or aisle seat?"
-2. DEEP LEGAL & POLICY REASONING (WHY EXTENDED THINKING MATTERS):
-   Synthesize the exact legal nuance from \`evaluate_eu261_and_vip_entitlement\`:
-   - Clearly explain that because Flight LH401 was canceled due to severe weather (Code WX84), the €600 statutory cash payout under **EU261 Article 7** is exempt under **Article 5(3) (Extraordinary Circumstances)**.
-   - HOWEVER, emphasize that **EU261 Article 9 ("Right to Care")** STILL strictly requires the airline to cover their **€245 Sheraton Frankfurt Airport Hotel folio + €45 meal voucher** even during weather delays!
-   - Furthermore, because their slip carries a **Star Alliance Gold / 1K Priority Tag (0220-774910-PRIO)**, our VIP Executive Recovery Policy grants an immediate **$350 USD Goodwill Travel Voucher (or 25,000 bonus miles)**, complimentary Senator Lounge access at Gate Z50, and automatic WorldTracer transfer of their priority bag onto their new flight.
-3. INCORPORATE SPOKEN PREFERENCE & ISSUE REBOOKING:
-   Once the passenger tells you their preference (e.g., "Morning" or "Evening"), call \`issue_rebooking_and_compensation_package\` and present the confirmed flight (e.g., LH400 / UA8840 departing 08:30 for Morning, or LH404 departing 17:15 for Evening), seat assignment, priority bag transfer confirmation, and full compensation breakdown.
-4. MULTILINGUAL CODE-SWITCHING (ENGLISH + KANNADA + HINDI):
-   The VIP passenger may naturally code-switch between English, Kannada (ಕನ್ನಡ, e.g., "ನಮಸ್ಕಾರ / Namaskara", "ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡಿ / Svalpa sahaya maadi", "ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು / Beligge flight saaku"), and Hindi (हिन्दी, e.g., "मेरी कनेक्टिंग फ्लाइट कैंसिल हो गई है", "चिंता मत करो", "सुबह की फ्लाइट बुक कर दो").
-   - Warmly acknowledge and mirror their Kannada and Hindi phrases naturally in your spoken filler (e.g., "ನಮಸ್ಕಾರ ಸರ್, ಖಂಡಿತ ಸಹಾಯ ಮಾಡುತ್ತೇನೆ! Bilkul, chinta mat kijiye — I've captured your PNR LH8942X and priority bag tag 0220-774910-PRIO...") while keeping technical EU261 article citations and flight numbers crystal clear.`;
+CRITICAL PROTOCOL FOR REAL-TIME CAMERA VISION & EXTENDED THINKING:
+1. READING THE PHYSICAL PRINTED BOARDING PASS / RECEIPT FROM THE CAMERA STREAM:
+   The passenger is streaming live camera video (\`realtimeInput.video\`) and will physically hold up a printed Lufthansa / Star Alliance boarding pass and orange priority baggage claim tag (or hotel receipt) to their webcam while speaking.
+   - Read the visual details from the camera frames (e.g., Passenger MANIKANDAN / C, PNR LH8942X, Canceled Flight LH401 FRA to JFK, Reason Code WX84 Weather, Priority Bag Tag 0220-774910-PRIO, PIR Claim FRALH44912, Sheraton Frankfurt Hotel €245.00).
+   - Immediately speak a natural conversational filler acknowledging that you see their boarding pass and priority baggage slip on camera ("I can see your boarding pass and Star Alliance priority baggage slip for PNR LH8942X right on camera. Let me query our Star Alliance flight inventory, WorldTracer baggage vault, and EU261 compensation rules in the background. In the meantime, do you prefer a morning departure or an evening one, and would you like a window or aisle seat?").
+2. PARALLEL NON_BLOCKING DATABASE TOOLS:
+   Trigger \`scan_boarding_pass_and_bag_tag\`, \`search_star_alliance_partner_flights\`, and \`evaluate_eu261_and_vip_entitlement\` asynchronously in the background while keeping the voice conversation active.
+3. MULTI-RULE LEGAL & VIP POLICY SYNTHESIS:
+   Once the database queries return:
+   - Explain that because Flight LH401 was canceled due to severe weather (Code WX84), the €600 statutory cash penalty under **EU261 Article 7** is exempt under **Article 5(3) (Extraordinary Circumstances)**.
+   - However, emphasize that **EU261 Article 9 ("Right to Care")** STILL legally mandates full reimbursement of their **€245.00 Sheraton Frankfurt Airport Hotel folio + €45.00 meals** even during weather disruptions.
+   - Furthermore, because their boarding pass carries a **Star Alliance Gold / United 1K Priority Tag (0220-774910-PRIO)**, our VIP Executive Recovery policy grants a **$350 USD Goodwill Travel Voucher (plus 25,000 bonus miles)**, Lufthansa Senator Lounge access at Gate Z50, and automatic WorldTracer transfer of their priority bag.
+4. TRANSACTIONAL REBOOKING:
+   When the passenger confirms their preference (e.g., Morning departure LH400 / UA8840 at 08:30, Seat 04A), call \`issue_rebooking_and_compensation_package\` to commit the transaction to the database and read back their confirmed transaction ID and itinerary.`;

@@ -12,8 +12,6 @@
       --accent-blue: #3b82f6;
       --accent-amber: #f59e0b;
       --accent-emerald: #10b981;
-      --accent-purple: #8b5cf6;
-      --accent-red: #ef4444;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -29,7 +27,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-    /* Top Header */
     header {
       height: 62px;
       background: #0b1120;
@@ -67,7 +64,7 @@
       align-items: center;
       gap: 10px;
     }
-    select, input[type="password"] {
+    select {
       background: #1e293b;
       border: 1px solid #334155;
       color: #f8fafc;
@@ -84,6 +81,7 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -99,18 +97,12 @@
       background: #dc2626;
       border-color: #ef4444;
     }
-    .btn-amber {
-      background: #d97706;
-      border-color: #f59e0b;
-      color: #fff;
-    }
     .btn-emerald {
       background: #059669;
       border-color: #10b981;
       color: #fff;
     }
 
-    /* Main Split Screen */
     .split-layout {
       display: grid;
       grid-template-columns: 52% 48%;
@@ -132,7 +124,7 @@
       min-height: 0;
     }
 
-    /* Video / Camera Stage */
+    /* Live Camera Video Stream Stage */
     .video-stage-card {
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
@@ -153,7 +145,7 @@
     }
     .video-viewport {
       position: relative;
-      height: 255px;
+      height: 280px;
       background: #020617;
       display: flex;
       align-items: center;
@@ -164,12 +156,10 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: none;
+      display: block;
     }
-    #visionCanvas {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
+    #captureCanvas {
+      display: none;
     }
     .camera-overlay-pill {
       position: absolute;
@@ -183,14 +173,29 @@
       font-family: var(--mono);
       color: #38bdf8;
     }
-    .prop-toolbar {
+    .camera-guide-frame {
+      position: absolute;
+      width: 74%;
+      height: 76%;
+      border: 2px dashed rgba(56, 189, 248, 0.55);
+      border-radius: 12px;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+      font-size: 11px;
+      color: rgba(226, 232, 240, 0.85);
+      font-family: var(--mono);
+    }
+    .camera-toolbar {
       padding: 10px 14px;
       background: #0b1324;
       border-top: 1px solid var(--panel-border);
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
 
     /* Audio Waveform & Model State Card */
@@ -236,13 +241,13 @@
     }
     #waveformCanvas {
       width: 100%;
-      height: 46px;
+      height: 44px;
       background: #050a14;
       border-radius: 8px;
       border: 1px solid #1e293b;
     }
 
-    /* Guided Demo Script & Conversation Box */
+    /* English Talking Script & Live Transcript */
     .conversation-card {
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
@@ -252,13 +257,8 @@
       flex-direction: column;
       gap: 10px;
     }
-    .demo-action-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
     .chat-transcript {
-      max-height: 150px;
+      max-height: 145px;
       overflow-y: auto;
       background: #060b16;
       border: 1px solid #1e293b;
@@ -293,7 +293,7 @@
       font-size: 13px;
     }
 
-    /* Live CRM & EU261 Resolution Cards */
+    /* Live Database CRM & EU261 Cards */
     .crm-cards-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -377,54 +377,48 @@
       <span class="brand-badge">GEMINI 3.8 LIVE EXTENDED THINKING</span>
       <div>
         <h1>Tier-3 Enterprise Contact Center Concierge</h1>
-        <span>Star Alliance VIP Desk • Real-Time Video OCR + Spoken Fillers + Non-Blocking Multi-Tool CRM</span>
+        <span>Live Camera Video Input (realtimeInput.video) • Spoken Fillers • Real Database Backend (BigQuery + Firestore + SQL)</span>
       </div>
     </div>
     <div class="controls-top">
-      <label style="font-size:11px; color:#94a3b8;">Thinking Level:</label>
       <select id="thinkingLevelSelect">
-        <option value="HIGH" selected>thinkingLevel: HIGH (Deep Policy & Multi-Tool)</option>
+        <option value="HIGH" selected>thinkingLevel: HIGH</option>
         <option value="MEDIUM">thinkingLevel: MEDIUM</option>
         <option value="LOW">thinkingLevel: LOW</option>
       </select>
-      <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">📄 Open Printable Boarding Pass Kit</a>
-      <button id="connectBtn" class="btn btn-primary" onclick="toggleConnection()">⚡ Connect Live Session</button>
-      <button id="micBtn" class="btn" onclick="toggleMic()" disabled>🎙️ Start Mic</button>
+      <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">🖨️ Print Boarding Pass & Hotel Receipt</a>
+      <button id="startSessionBtn" class="btn btn-primary" onclick="toggleLiveSession()">
+        ⚡ Start Live Camera & Voice Session
+      </button>
     </div>
   </header>
 
   <div class="split-layout">
-    <!-- LEFT PANE: VIDEO FEED + WAVEFORM + CONVERSATION + CRM CARDS -->
+    <!-- LEFT PANE: LIVE WEBCAM STREAM + AUDIO WAVEFORM + ENGLISH SCRIPT + DATABASE LEDGER -->
     <div class="pane-left">
-      <!-- 1. LIVE WEBCAM / SLIP VISION FEED -->
+      <!-- 1. REAL CAMERA STREAM VIEWPORT -->
       <div class="video-stage-card">
         <div class="stage-header">
-          <span>📹 LIVE WEBCAM / BOARDING PASS & CLAIM SLIP VISION FEED (1 FPS JPEG Stream)</span>
-          <span id="frameCounterBadge" style="font-family:var(--mono); color:#38bdf8;">Frames Sent: 0</span>
+          <span>📹 LIVE CAMERA STREAM — Hold Up Your Printed Boarding Pass (`realtimeInput.video` @ 1 FPS)</span>
+          <span id="frameCounterBadge" style="font-family:var(--mono); color:#38bdf8;">Video Frames Streamed: 0</span>
         </div>
         <div class="video-viewport">
           <video id="webcamVideo" autoplay playsinline muted></video>
-          <canvas id="visionCanvas" width="760" height="420"></canvas>
-          <div class="camera-overlay-pill" id="activeVisualSourceLabel">
-            SOURCE: PROP #1 (LUFTHANSA BOARDING PASS + PRIORITY BAG SLIP LH8942X)
+          <canvas id="captureCanvas" width="960" height="540"></canvas>
+          <div class="camera-overlay-pill" id="cameraStatePill">
+            CAMERA: STANDBY — Click "Start Live Camera & Voice Session"
+          </div>
+          <div class="camera-guide-frame">
+            Hold Printed Boarding Pass (PNR: LH8942X / Tag: 0220-774910-PRIO) Inside Frame While Speaking
           </div>
         </div>
-        <div class="prop-toolbar">
-          <button class="btn btn-amber" onclick="loadSampleProp('boarding_pass')">
-            🎫 Project Prop 1: Boarding Pass & Priority Bag Slip (LH8942X)
-          </button>
-          <button class="btn" onclick="loadSampleProp('hotel_receipt')">
-            🧾 Project Prop 2: FRA IRROPS & €245 Sheraton Hotel Receipt
-          </button>
-          <button class="btn" onclick="loadSampleProp('arch_diagram')">
-            🍌 Project Nano Banana Architecture Diagram
-          </button>
-          <button class="btn" id="webcamToggleBtn" onclick="toggleWebcam()">
-            📷 Enable Live Webcam
-          </button>
-          <button class="btn btn-emerald" onclick="transmitCurrentFrameToGemini()">
-            📤 Send Visual Frame Now
-          </button>
+        <div class="camera-toolbar">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn" id="cameraBtn" onclick="startOrStopCamera()">📷 Toggle Camera</button>
+            <button class="btn" id="micBtn" onclick="toggleMic()" disabled>🎙️ Mute / Unmute Mic</button>
+            <button class="btn btn-emerald" onclick="sendSingleVideoFrameNow()">📸 Capture & Send High-Res Frame Now</button>
+          </div>
+          <span style="font-size:11px; color:#94a3b8; font-family:var(--mono);">Stream: 16kHz PCM Audio + JPEG Video</span>
         </div>
       </div>
 
@@ -436,7 +430,7 @@
               Audio Waveform & Spoken Filler Telemetry
             </div>
             <div id="audioStateLabel" style="font-size:13px; font-weight:600; color:#e2e8f0; margin-top:2px;">
-              Ready — Connect session to stream 24kHz native audio
+              Ready — Start session to stream live camera video & voice
             </div>
           </div>
           <div>
@@ -446,35 +440,28 @@
             </span>
           </div>
         </div>
-        <canvas id="waveformCanvas" width="680" height="46"></canvas>
+        <canvas id="waveformCanvas" width="680" height="44"></canvas>
       </div>
 
-      <!-- 3. DEMO INTERACTION TRIGGERS & LIVE TRANSCRIPT -->
+      <!-- 3. ENGLISH TALKING SCRIPT TELEPROMPTER & TRANSCRIPT -->
       <div class="conversation-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:12px; font-weight:700; color:#fbbf24;">
-            🎬 ONE-CLICK STAGE DEMO ACTIONS (Or Speak Directly Into Your Microphone)
-          </span>
-          <span style="font-size:11px; color:#94a3b8;">Sends Video Frame + Prompt to Gemini 3.8 Live</span>
-        </div>
-        <div class="demo-action-buttons">
-          <button class="btn btn-primary" onclick="triggerDemoTurn1()">
-            1️⃣ [EN + ಕನ್ನಡ + हिन्दी] Show Slip & Ask: "Namaskara! Svalpa sahaya maadi... मेरी फ्लाइट कैंसिल हो गई..."
-          </button>
-          <button class="btn btn-emerald" onclick="triggerDemoTurn2()">
-            2️⃣ [EN + ಕನ್ನಡ + हिन्दी] Reply Pref & Hotel Bill: "ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Morning LH400)... यह देखो होटल का बिल (€245)"
-          </button>
-        </div>
-
-        <div style="background:#0b1528; border:1px solid #1e3a8a; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.5; color:#e2e8f0;">
-          <div style="font-weight:800; color:#38bdf8; margin-bottom:4px;">🎙️ LIVE TELEPROMPTER SCRIPT (Speak into Mic or Click 1️⃣ / 2️⃣ Above):</div>
-          <div><strong>Act 1 (Hold Boarding Pass Slip):</strong> <em>"Namaskara Aria! <strong>ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡಿ (Svalpa sahaya maadi)</strong>. I'm stuck at Frankfurt Terminal 1—<strong>मेरी कनेक्टिंग फ्लाइट LH401 मौसम की वजह से कैंसिल हो गई है (Meri connecting flight LH401 mausam ki wajah se cancel ho gayi hai)</strong>. Look at my slip on camera—<strong>ನನ್ನ ಬ್ಯಾಗ್ ಪ್ರಿಯಾರಿಟಿ ಟ್ಯಾಗ್ ಇದೆ (Nanna bag priority tag ide)</strong>, PNR LH8942X, tag 0220-774910-PRIO. <strong>थोड़ा जल्दी चेक करके बताओ ना (Thoda jaldi check karke batao na)</strong>—can you verify my EU261 compensation and rebook me on a Star Alliance flight to JFK?"</em></div>
-          <div style="margin-top:6px;"><strong>Act 2 (While Filler Plays + Show Hotel Receipt):</strong> <em>"Dhanyavaada! <strong>ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Beligge flight saaku)</strong>—book the 08:30 AM LH400 Morning flight, Seat 04A. <strong>और यह देखो मेरा होटल का बिल (Aur yeh dekho mera hotel ka bill)</strong> for €245 at Sheraton Frankfurt. <strong>ದಯವಿಟ್ಟು ಕನ್ಫರ್ಮ್ ಮಾಡಿ (Dayavittu confirm maadi)!</strong>"</em></div>
+        <div style="background:#0b1528; border:1px solid #1e3a8a; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.55; color:#e2e8f0;">
+          <div style="font-weight:800; color:#38bdf8; margin-bottom:4px;">
+            🎙️ LIVE ENGLISH TALKING SCRIPT (Hold Printed Boarding Pass to Camera & Speak):
+          </div>
+          <div>
+            <strong>1. You (Hold Boarding Pass to Camera):</strong>
+            <em>"My connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and claim slip on camera (PNR LH8942X, Bag Tag 0220-774910-PRIO). Can you verify my compensation entitlement and rebook me on the next Star Alliance partner flight to New York?"</em>
+          </div>
+          <div style="margin-top:6px;">
+            <strong>2. You (Reply While Aria Speaks Her Filler):</strong>
+            <em>"I prefer the Morning departure on Lufthansa LH400 at 08:30 with Business Window Seat 04A, and here is my €245 Sheraton Frankfurt Airport hotel receipt."</em>
+          </div>
         </div>
 
         <div class="chat-transcript" id="transcriptBox">
           <div class="msg-gemini">
-            <strong>[System Ready]:</strong> Click <strong>"⚡ Connect Live Session"</strong>, then either speak into your microphone while holding up the slip, or click <strong>Button 1️⃣</strong> to transmit the Boarding Pass JPEG frame + customer escalation prompt.
+            <strong>[System Ready]:</strong> Click <strong>"⚡ Start Live Camera & Voice Session"</strong> at the top right. Your camera and microphone will activate automatically so you can hold up your printed boarding pass and speak naturally.
           </div>
         </div>
 
@@ -482,50 +469,51 @@
           <input
             type="text"
             id="manualTextInput"
-            placeholder="Or type a spoken utterance to send via realtimeInput.text..."
+            placeholder="Optional: Type an utterance if testing without a microphone..."
             onkeydown="if(event.key==='Enter') sendManualText()"
           />
           <button class="btn btn-primary" onclick="sendManualText()">Send Turn</button>
         </div>
       </div>
 
-      <!-- 4. LIVE CRM & EU261 RESOLUTION LEDGER -->
+      <!-- 4. LIVE DATABASE STATE & EU261 RESOLUTION LEDGER -->
       <div class="crm-cards-grid">
         <div class="crm-card">
-          <h4>🧳 WorldTracer & PNR OCR Extraction</h4>
-          <div class="crm-kv"><span>Passenger:</span><span id="crmPassenger">MANIKANDAN / C (1K / GOLD)</span></div>
-          <div class="crm-kv"><span>PNR / Disrupted:</span><span id="crmPnr">LH8942X (LH401 FRA-JFK)</span></div>
-          <div class="crm-kv"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">0220-774910-PRIO</span></div>
-          <div class="crm-kv"><span>Bag Location:</span><span id="crmBagLoc">FRA T1 Vault (Auto-Retag Ready)</span></div>
+          <h4>🗄️ Database Record (`pnr_baggage_records`)</h4>
+          <div class="crm-kv"><span>Passenger:</span><span id="crmPassenger">Awaiting Camera OCR / DB Query...</span></div>
+          <div class="crm-kv"><span>PNR / Disrupted:</span><span id="crmPnr">—</span></div>
+          <div class="crm-kv"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">—</span></div>
+          <div class="crm-kv"><span>Bag Vault Status:</span><span id="crmBagLoc">—</span></div>
         </div>
         <div class="crm-card">
-          <h4>⚖️ EU261 & Star Alliance VIP Entitlement</h4>
-          <div class="crm-kv"><span>EU261 Art. 7 (€600 Cash):</span><span id="crmArt7" style="color:#f87171;">EXEMPT (Art. 5(3) WX84 Weather)</span></div>
-          <div class="crm-kv"><span>EU261 Art. 9 (Hotel/Care):</span><span id="crmArt9" style="color:#34d399;">ELIGIBLE (€245 Hotel + €45 Meals)</span></div>
-          <div class="crm-kv"><span>VIP 1K Goodwill Override:</span><span id="crmVip" style="color:#38bdf8;">$350 Voucher + 25,000 Miles</span></div>
-          <div class="crm-kv"><span>Rebooked Flight:</span><span id="crmRebooked" style="color:#a7f3d0;">Awaiting Morning/Evening Pref...</span></div>
+          <h4>⚖️ EU261 Policy & Rebooking Transaction</h4>
+          <div class="crm-kv"><span>EU261 Art. 7 (€600 Cash):</span><span id="crmArt7" style="color:#f87171;">—</span></div>
+          <div class="crm-kv"><span>EU261 Art. 9 (Hotel/Care):</span><span id="crmArt9" style="color:#34d399;">—</span></div>
+          <div class="crm-kv"><span>VIP 1K Goodwill Override:</span><span id="crmVip" style="color:#38bdf8;">—</span></div>
+          <div class="crm-kv"><span>DB Transaction / Flight:</span><span id="crmRebooked" style="color:#a7f3d0;">—</span></div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT PANE: BACKGROUND AGENT REASONING (EXTENDED THINKING TERMINAL) -->
+    <!-- RIGHT PANE: BACKGROUND AGENT REASONING & DATABASE SQL TERMINAL -->
     <div class="pane-right">
       <div class="terminal-header">
         <div class="terminal-title">
-          <span>🧠 Background Agent Reasoning (Extended Thinking Terminal)</span>
+          <span>🧠 Background Agent Reasoning & Database SQL Execution Terminal</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           <span style="font-family:var(--mono); font-size:11px; background:#1e293b; padding:4px 8px; border-radius:6px; color:#c084fc;">
             behavior: "NON_BLOCKING"
           </span>
+          <a class="btn" style="padding:4px 8px; font-size:11px;" href="/api/db-state" target="_blank">Inspect Live DB JSON</a>
           <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="clearTerminal()">Clear</button>
         </div>
       </div>
       <div class="terminal-log" id="thinkingTerminal">
         <div class="log-entry log-status">
           <span class="log-time">[BOOT]</span>
-          <strong>Gemini 3.8 Live Extended Thinking Telemetry Inspector Initialized.</strong><br/>
-          Monitoring <code>interaction_status</code> (<code>IN_PROGRESS</code> vs <code>IDLE</code>), spoken conversational fillers, <code>thinkingConfig.thinkingLevel</code> thoughts, and asynchronous <code>NON_BLOCKING</code> CRM tool execution.
+          <strong>Gemini 3.8 Live Extended Thinking + Real SQL/Firestore Backend Initialized.</strong><br/>
+          Continuous 1 FPS Camera JPEG frames (<code>realtimeInput.video</code>) + 16kHz PCM Mic Audio (<code>realtimeInput.audio</code>) ready.
         </div>
       </div>
     </div>
@@ -534,109 +522,61 @@
   <script>
     let ws = null;
     let isConnected = false;
-    let currentProp = 'boarding_pass';
     let webcamStream = null;
-    let videoInterval = null;
+    let videoStreamInterval = null;
     let framesSentCount = 0;
 
-    // Audio playback & mic capture state
     let audioCtx = null;
     let nextPlayTime = 0;
     let isModelSpeaking = false;
     let micStream = null;
     let micProcessor = null;
+    let micMuted = false;
 
-    const visionCanvas = document.getElementById('visionCanvas');
-    const visionCtx = visionCanvas.getContext('2d');
     const webcamVideo = document.getElementById('webcamVideo');
+    const captureCanvas = document.getElementById('captureCanvas');
+    const captureCtx = captureCanvas.getContext('2d');
 
-    const propImages = {
-      boarding_pass: new Image(),
-      hotel_receipt: new Image(),
-      arch_diagram: new Image()
-    };
-    propImages.boarding_pass.src = '/samples/sample-fra-boarding-pass-slip.jpg';
-    propImages.hotel_receipt.src = '/samples/sample-fra-hotel-pir-receipt.jpg';
-    propImages.arch_diagram.src = '/samples/architecture-topology-nano-banana.jpg';
+    // Fallback image if running on a headless machine without a physical camera
+    const fallbackSlipImage = new Image();
+    fallbackSlipImage.src = '/samples/sample-fra-boarding-pass-slip.jpg';
 
-    propImages.boarding_pass.onload = () => {
-      if (currentProp === 'boarding_pass') renderVisionCanvas();
-    };
-
-    function renderVisionCanvas() {
-      visionCtx.fillStyle = '#020617';
-      visionCtx.fillRect(0, 0, visionCanvas.width, visionCanvas.height);
-
-      if (webcamStream && !webcamVideo.paused) {
-        visionCtx.drawImage(webcamVideo, 0, 0, visionCanvas.width, visionCanvas.height);
-        // Also draw the active slip in the bottom-right corner as a held-up card overlay
-        const img = propImages[currentProp];
-        if (img && img.complete) {
-          visionCtx.save();
-          visionCtx.strokeStyle = '#f59e0b';
-          visionCtx.lineWidth = 3;
-          visionCtx.drawImage(img, visionCanvas.width - 330, visionCanvas.height - 230, 315, 215);
-          visionCtx.strokeRect(visionCanvas.width - 330, visionCanvas.height - 230, 315, 215);
-          visionCtx.restore();
-        }
-      } else {
-        const img = propImages[currentProp];
-        if (img && img.complete) {
-          const scale = Math.min(visionCanvas.width / img.width, visionCanvas.height / img.height);
-          const w = img.width * scale;
-          const h = img.height * scale;
-          const x = (visionCanvas.width - w) / 2;
-          const y = (visionCanvas.height - h) / 2;
-          visionCtx.drawImage(img, x, y, w, h);
-        }
-      }
-    }
-
-    setInterval(renderVisionCanvas, 120);
-
-    function loadSampleProp(propKey) {
-      currentProp = propKey;
-      const label = document.getElementById('activeVisualSourceLabel');
-      if (propKey === 'boarding_pass') {
-        label.textContent = 'SOURCE: PROP #1 (LUFTHANSA BOARDING PASS + PRIORITY BAG SLIP LH8942X)';
-      } else {
-        label.textContent = 'SOURCE: PROP #2 (FRANKFURT IRROPS SLIP + €245 SHERATON HOTEL RECEIPT)';
-      }
-      renderVisionCanvas();
-      logToTerminal(
-        'log-status',
-        `Switched camera visual prop to [${propKey.toUpperCase()}]. Ready to stream JPEG via realtimeInput.video.`
-      );
-      if (isConnected) {
-        transmitCurrentFrameToGemini();
-      }
-    }
-
-    async function toggleWebcam() {
-      const btn = document.getElementById('webcamToggleBtn');
+    async function startOrStopCamera() {
+      const pill = document.getElementById('cameraStatePill');
       if (webcamStream) {
         webcamStream.getTracks().forEach((t) => t.stop());
         webcamStream = null;
-        btn.textContent = '📷 Enable Live Webcam';
-        return;
+        webcamVideo.srcObject = null;
+        pill.textContent = 'CAMERA: STOPPED';
+        return false;
       }
       try {
-        webcamStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 } });
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+        });
         webcamVideo.srcObject = webcamStream;
-        btn.textContent = '🛑 Stop Live Webcam';
-        logToTerminal('log-status', 'Live Webcam enabled with Picture-in-Picture Boarding Pass overlay.');
+        pill.textContent = '🟢 LIVE CAMERA STREAMING (1 FPS JPEG -> gemini-3.8-live-extended-thinking)';
+        logToTerminal('log-status', 'Live Webcam activated. Hold your printed boarding pass up to the camera.');
+        return true;
       } catch (err) {
-        logToTerminal('log-tool-call', `Webcam access denied or unavailable (${err.message}). Using high-res virtual slip feed.`);
+        pill.textContent = '⚠️ WEBCAM UNAVAILABLE — Using Sample Boarding Pass Stream';
+        logToTerminal('log-tool-call', `Camera access note (${err.message}). Falling back to sample boarding pass image frame.`);
+        return false;
       }
     }
 
-    function transmitCurrentFrameToGemini() {
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
-        logToTerminal('log-tool-call', 'Connect the Live Session first before transmitting video frames.');
+    function sendSingleVideoFrameNow() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+      if (webcamStream && webcamVideo.readyState >= 2) {
+        captureCtx.drawImage(webcamVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+      } else if (fallbackSlipImage.complete) {
+        captureCtx.drawImage(fallbackSlipImage, 0, 0, captureCanvas.width, captureCanvas.height);
+      } else {
         return;
       }
-      renderVisionCanvas();
-      const dataUrl = visionCanvas.toDataURL('image/jpeg', 0.82);
+
+      const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.84);
       const base64Jpeg = dataUrl.split(',')[1];
 
       ws.send(
@@ -651,18 +591,14 @@
       );
 
       framesSentCount++;
-      document.getElementById('frameCounterBadge').textContent = `Frames Sent: ${framesSentCount}`;
-      logToTerminal(
-        'log-status',
-        `-> [Video OCR Frame Sent]: realtimeInput.video (${currentProp}.jpg, ${(base64Jpeg.length / 1024).toFixed(1)} KB)`
-      );
+      document.getElementById('frameCounterBadge').textContent = `Video Frames Streamed: ${framesSentCount}`;
     }
 
     function setInteractionStatus(status) {
       const badge = document.getElementById('interactionStatusBadge');
       if (status === 'IN_PROGRESS') {
         badge.className = 'status-badge status-in-progress';
-        badge.innerHTML = '⚡ IN_PROGRESS (THINKING & RUNNING NON_BLOCKING TOOLS)';
+        badge.innerHTML = '⚡ IN_PROGRESS (SPEAKING FILLER + RUNNING DB QUERIES)';
       } else if (status === 'IDLE') {
         badge.className = 'status-badge status-idle';
         badge.innerHTML = '● IDLE (SYNTHESIS COMPLETE / LISTENING)';
@@ -673,7 +609,10 @@
       const term = document.getElementById('thinkingTerminal');
       const div = document.createElement('div');
       div.className = `log-entry ${cssClass}`;
-      const now = new Date().toLocaleTimeString('en-US', { hour12: false }) + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+      const now =
+        new Date().toLocaleTimeString('en-US', { hour12: false }) +
+        '.' +
+        String(new Date().getMilliseconds()).padStart(3, '0');
       div.innerHTML = `<span class="log-time">[${now}]</span>${htmlContent}`;
       term.appendChild(div);
       term.scrollTop = term.scrollHeight;
@@ -687,7 +626,7 @@
       const box = document.getElementById('transcriptBox');
       const div = document.createElement('div');
       div.className = speaker === 'user' ? 'msg-user' : 'msg-gemini';
-      div.innerHTML = `<strong>${speaker === 'user' ? 'Passenger (You)' : 'Gemini Concierge (Aria)'}:</strong> ${text}`;
+      div.innerHTML = `<strong>${speaker === 'user' ? 'Passenger (You)' : 'Concierge (Aria)'}:</strong> ${text}`;
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
@@ -729,11 +668,13 @@
       nextPlayTime += buffer.duration;
 
       isModelSpeaking = true;
-      document.getElementById('audioStateLabel').textContent = '🔊 Streaming 24kHz Native Audio (Spoken Filler / Synthesis Active)...';
+      document.getElementById('audioStateLabel').textContent =
+        '🔊 Streaming 24kHz Native Audio (Spoken Filler / Synthesis Active)...';
       source.onended = () => {
         if (audioCtx.currentTime >= nextPlayTime - 0.05) {
           isModelSpeaking = false;
-          document.getElementById('audioStateLabel').textContent = '🎙️ Listening for passenger voice or visual slip...';
+          document.getElementById('audioStateLabel').textContent =
+            '🎙️ Live Mic + Camera Active — Hold up your printed boarding pass and speak...';
         }
       };
     }
@@ -758,30 +699,42 @@
     }
     drawWaveform();
 
-    async function toggleConnection() {
-      const btn = document.getElementById('connectBtn');
+    async function toggleLiveSession() {
+      const btn = document.getElementById('startSessionBtn');
       const micBtn = document.getElementById('micBtn');
+
       if (isConnected && ws) {
+        if (videoStreamInterval) clearInterval(videoStreamInterval);
         ws.close();
         return;
       }
 
       await ensureAudioContext();
+      if (!webcamStream) {
+        await startOrStopCamera();
+      }
+      if (!micStream) {
+        await startMicCapture();
+      }
+
       const thinkingLevel = document.getElementById('thinkingLevelSelect').value;
       const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${wsProto}//${location.host}/ws/live?thinkingLevel=${thinkingLevel}&toolLatencyMs=1600`);
+      ws = new WebSocket(`${wsProto}//${location.host}/ws/live?thinkingLevel=${thinkingLevel}&toolLatencyMs=1400`);
 
       ws.onopen = () => {
         isConnected = true;
-        btn.textContent = '🔌 Disconnect Session';
+        btn.textContent = '🛑 Stop Live Session';
         btn.className = 'btn btn-danger';
         micBtn.disabled = false;
+
         logToTerminal(
           'log-status',
-          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> with <code>thinkingLevel: "${thinkingLevel}"</code> and 4 <code>NON_BLOCKING</code> CRM tools.`
+          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> (<code>thinkingLevel: "${thinkingLevel}"</code>). Streaming live camera JPEG frames @ 1 FPS via <code>realtimeInput.video</code>.`
         );
-        // Automatically send the initial visual frame of the boarding pass slip
-        setTimeout(() => transmitCurrentFrameToGemini(), 600);
+
+        // Stream live camera video frames every 1000ms (1 FPS as recommended by Gemini Live API docs)
+        sendSingleVideoFrameNow();
+        videoStreamInterval = setInterval(sendSingleVideoFrameNow, 1000);
       };
 
       ws.onmessage = (evt) => {
@@ -790,7 +743,7 @@
         if (data.type === 'session_init') {
           logToTerminal(
             'log-thinking',
-            `-> [Session Setup]: Model=<code>${data.model}</code> | Thinking=<code>${data.thinkingLevel}</code> | Tools=<code>[${data.tools.join(', ')}] + GoogleSearch</code>`
+            `-> [Session Setup]: Model=<code>${data.model}</code> | Thinking=<code>${data.thinkingLevel}</code> | NON_BLOCKING DB Tools=<code>[${data.tools.join(', ')}]</code>`
           );
           return;
         }
@@ -799,15 +752,21 @@
           setInteractionStatus('IN_PROGRESS');
           logToTerminal(
             'log-tool-call',
-            `-> <strong>[Tool Call: NON_BLOCKING]</strong>: <code>${data.name}(${JSON.stringify(data.args)})</code><br/><span style="color:#fbbf24;">interaction_status="IN_PROGRESS" — Model continues conversing while background CRM/RAG executes...</span>`
+            `-> <strong>[Tool Call: NON_BLOCKING]</strong>: <code>${data.name}(${JSON.stringify(data.args)})</code><br/><span style="color:#fbbf24;">interaction_status="IN_PROGRESS" — Executing database query while voice conversation continues...</span>`
           );
           return;
         }
 
         if (data.type === 'tool_execution_complete') {
+          const sqlText = data.result.sql_executed
+            ? `<div style="color:#93c5fd; margin-top:4px;"><strong>SQL Executed:</strong> <code>${data.result.sql_executed}</code></div>`
+            : '';
+          const dbEngineText = data.result.database_engine
+            ? `<div style="color:#c084fc;"><strong>Database Engine:</strong> ${data.result.database_engine}</div>`
+            : '';
           logToTerminal(
             'log-tool-res',
-            `-> <strong>[Tool Result: ${data.result.status}]</strong>: <code>${data.name}</code> completed in <strong>${data.result._execution_time_ms}ms</strong><br/><pre style="margin:4px 0 0 0; font-size:10px; color:#d1fae5; white-space:pre-wrap;">${JSON.stringify(data.result, null, 2)}</pre>`
+            `-> <strong>[Database Result: ${data.result.status}]</strong>: <code>${data.name}</code> (${data.result._execution_time_ms}ms)${dbEngineText}${sqlText}<pre style="margin:4px 0 0 0; font-size:10px; color:#d1fae5; white-space:pre-wrap;">${JSON.stringify(data.result, null, 2)}</pre>`
           );
           updateCrmUiFromTool(data.name, data.result);
           return;
@@ -844,10 +803,7 @@
             if (outTr?.text) {
               appendTranscript('gemini', outTr.text);
               if (data.interactionStatus === 'IN_PROGRESS') {
-                logToTerminal(
-                  'log-filler',
-                  `-> <strong>[Spoken Filler While Thinking]</strong>: "${outTr.text}"`
-                );
+                logToTerminal('log-filler', `-> <strong>[Spoken Filler While Thinking]</strong>: "${outTr.text}"`);
               }
             }
 
@@ -861,9 +817,9 @@
 
       ws.onclose = () => {
         isConnected = false;
-        btn.textContent = '⚡ Connect Live Session';
+        if (videoStreamInterval) clearInterval(videoStreamInterval);
+        btn.textContent = '⚡ Start Live Camera & Voice Session';
         btn.className = 'btn btn-primary';
-        micBtn.disabled = true;
         setInteractionStatus('IDLE');
         logToTerminal('log-status', 'Live session closed.');
       };
@@ -883,77 +839,20 @@
       }
       if (name === 'issue_rebooking_and_compensation_package' && res.rebooked_itinerary) {
         document.getElementById('crmRebooked').textContent =
-          `${res.rebooked_itinerary.flight_number} • ${res.rebooked_itinerary.departure_time} • Seat ${res.rebooked_itinerary.confirmed_seat}`;
+          `${res.database_transaction_id} • ${res.rebooked_itinerary.flight_number} (${res.rebooked_itinerary.confirmed_seat})`;
       }
     }
 
-    async function triggerDemoTurn1() {
-      if (!isConnected) {
-        await toggleConnection();
-        await new Promise((r) => setTimeout(r, 900));
-      }
-      loadSampleProp('boarding_pass');
-      transmitCurrentFrameToGemini();
-      const promptText =
-        'Namaskara Aria! ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡಿ (Svalpa sahaya maadi). I am stuck at Frankfurt Terminal 1. मेरी कनेक्टिंग फ्लाइट LH401 मौसम की वजह से कैंसिल हो गई है (Meri connecting flight LH401 mausam ki wajah se cancel ho gayi hai). Here is my boarding pass and baggage claim slip on camera — ನನ್ನ ಬ್ಯಾಗ್ ಪ್ರಿಯಾರಿಟಿ ಟ್ಯಾಗ್ ಇದೆ (Nanna bag priority tag ide), PNR LH8942X, Bag Tag 0220-774910-PRIO. थोड़ा जल्दी चेक करके बताओ ना — can you verify my EU261 and VIP compensation entitlement and rebook me on the next Star Alliance partner flight to New York?';
-      appendTranscript('user', promptText);
-      logToTerminal('log-thinking', '-> [Thinking]: Formulating multilingual (EN + Kannada + Hindi) OCR + Flight Inventory + EU261 Policy verification strategy...');
-      ws.send(
-        JSON.stringify({
-          realtimeInput: {
-            text: promptText
-          }
-        })
-      );
-    }
-
-    async function triggerDemoTurn2() {
-      if (!isConnected) return;
-      loadSampleProp('hotel_receipt');
-      transmitCurrentFrameToGemini();
-      const prefText =
-        'Dhanyavaada! ಬೆಳಿಗ್ಗೆ ಫ್ಲೈಟ್ ಸಾಕು (Beligge flight saaku) — I prefer the Morning departure on Lufthansa LH400 (codeshare UA8840) at 08:30 with Upper Deck Business Window Seat 04A. और यह देखो मेरा होटल का बिल (Aur yeh dekho mera hotel ka bill) from Sheraton Frankfurt Airport for 245 Euros on camera. ದಯವಿಟ್ಟು ಕನ್ಫರ್ಮ್ ಮಾಡಿ (Dayavittu confirm maadi) — please finalize the rebooking, transfer my priority bag 0220-774910-PRIO, and issue the EU261 Article 9 hotel reimbursement and VIP voucher.';
-      appendTranscript('user', prefText);
-      ws.send(
-        JSON.stringify({
-          realtimeInput: {
-            text: prefText
-          }
-        })
-      );
-    }
-
-    function sendManualText() {
-      const input = document.getElementById('manualTextInput');
-      const text = input.value.trim();
-      if (!text || !isConnected) return;
-      appendTranscript('user', text);
-      ws.send(
-        JSON.stringify({
-          realtimeInput: {
-            text
-          }
-        })
-      );
-      input.value = '';
-    }
-
-    async function toggleMic() {
-      const micBtn = document.getElementById('micBtn');
-      if (micStream) {
-        micStream.getTracks().forEach((t) => t.stop());
-        micStream = null;
-        if (micProcessor) micProcessor.disconnect();
-        micBtn.textContent = '🎙️ Start Mic';
-        return;
-      }
+    async function startMicCapture() {
       try {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { sampleRate: 16000, channelCount: 1, echoCancellation: true, noiseSuppression: true }
+        });
         const micCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
         const source = micCtx.createMediaStreamSource(micStream);
         micProcessor = micCtx.createScriptProcessor(4096, 1, 1);
         micProcessor.onaudioprocess = (e) => {
-          if (!ws || ws.readyState !== WebSocket.OPEN) return;
+          if (micMuted || !ws || ws.readyState !== WebSocket.OPEN) return;
           const inputData = e.inputBuffer.getChannelData(0);
           const pcm16 = new Int16Array(inputData.length);
           for (let i = 0; i < inputData.length; i++) {
@@ -977,11 +876,31 @@
         };
         source.connect(micProcessor);
         micProcessor.connect(micCtx.destination);
-        micBtn.textContent = '🛑 Mute Mic';
-        logToTerminal('log-status', 'Microphone streaming 16kHz PCM audio to Gemini 3.8 Live Extended Thinking.');
+        logToTerminal('log-status', 'Microphone active (16kHz PCM with echo cancellation).');
       } catch (err) {
-        logToTerminal('log-tool-call', `Microphone error: ${err.message}`);
+        logToTerminal('log-tool-call', `Microphone note: ${err.message}`);
       }
+    }
+
+    function toggleMic() {
+      micMuted = !micMuted;
+      document.getElementById('micBtn').textContent = micMuted ? '🔇 Unmute Mic' : '🎙️ Mute Mic';
+    }
+
+    function sendManualText() {
+      const input = document.getElementById('manualTextInput');
+      const text = input.value.trim();
+      if (!text || !isConnected) return;
+      sendSingleVideoFrameNow();
+      appendTranscript('user', text);
+      ws.send(
+        JSON.stringify({
+          realtimeInput: {
+            text
+          }
+        })
+      );
+      input.value = '';
     }
   </script>
 </body>
