@@ -405,16 +405,22 @@
       </div>
     </div>
     <div class="header-actions">
+      <select id="cameraDeviceSelect" onchange="switchCameraDevice(this.value)" title="Select Webcam Input">
+        <option value="">📹 Detecting Camera...</option>
+      </select>
+      <select id="fpsSelect" onchange="updateStreamFps(this.value)" title="Continuous Video Stream Rate">
+        <option value="1000" selected>🔴 Stream: 1 FPS (realtimeInput.video)</option>
+        <option value="500">🔴 Stream: 2 FPS (High Motion)</option>
+      </select>
       <select id="thinkingLevelSelect">
         <option value="HIGH" selected>thinkingLevel: HIGH</option>
         <option value="MEDIUM">thinkingLevel: MEDIUM</option>
         <option value="LOW">thinkingLevel: LOW</option>
       </select>
       <button class="btn" id="micBtn" onclick="toggleMic()" disabled>🎙️ Mute Mic</button>
-      <button class="btn btn-emerald" onclick="sendSingleVideoFrameNow()">📸 Snap Frame Now</button>
       <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">🖨️ Print Boarding Pass</a>
       <button id="startSessionBtn" class="btn btn-primary" onclick="toggleLiveSession()">
-        ⚡ Start Live Camera & Voice Session
+        ⚡ Start Live Video & Voice Stream
       </button>
     </div>
   </header>
@@ -429,15 +435,23 @@
 
           <div class="camera-top-hud">
             <span class="hud-pill" id="cameraStatePill">
-              CAMERA STANDBY — Click "Start Live Camera & Voice Session"
+              🟢 INITIALIZING LIVE CAMERA FEED...
             </span>
             <span class="hud-pill" id="frameCounterBadge">
-              Frames Streamed: 0
+              Continuous Video Stream: Standby (0 frames)
             </span>
           </div>
 
           <div class="scan-reticle">
-            Hold Printed Boarding Pass (PNR: LH8942X • Bag Tag: 0220-774910-PRIO) Here While Speaking
+            Hold Printed Boarding Pass Up to Live Video Stream While Speaking (No Need to Click Anything)
+          </div>
+
+          <!-- Live PIP Monitor showing exact frames continuously streamed via realtimeInput.video -->
+          <div style="position:absolute; bottom:14px; right:16px; background:rgba(5,8,17,0.88); border:1px solid #10b981; border-radius:10px; padding:6px; display:flex; flex-direction:column; align-items:center; gap:4px; box-shadow:0 8px 20px rgba(0,0,0,0.6);">
+            <canvas id="pipStreamCanvas" width="144" height="81" style="border-radius:6px; background:#020617; display:block;"></canvas>
+            <span id="pipStreamLabel" style="font-family:var(--mono); font-size:10px; color:#34d399; font-weight:700;">
+              realtimeInput.video (1 FPS)
+            </span>
           </div>
         </div>
 
@@ -446,10 +460,10 @@
             <canvas id="waveformCanvas" width="240" height="38"></canvas>
             <div>
               <div style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">
-                Voice & Filler Stream
+                Continuous Video + Voice Stream (`BidiGenerateContent`)
               </div>
               <div id="audioStateLabel" style="font-size:13px; font-weight:600; color:var(--text-primary);">
-                Ready — Start session to enable camera & microphone
+                Webcam active — Click "Start Live Video & Voice Stream" and speak while holding pass
               </div>
             </div>
           </div>
@@ -466,7 +480,7 @@
             💬 Live CRM Summary & Transcript
           </button>
           <button class="tab-btn" onclick="switchTab('script', this)">
-            🎙️ English Talking Script (2 Steps)
+            🎙️ Hands-Free Video Stream Script (2 Steps)
           </button>
         </div>
 
@@ -475,7 +489,7 @@
           <div class="summary-grid">
             <div class="info-box">
               <h4>🗄️ Passenger & WorldTracer (`pnr_baggage_records`)</h4>
-              <div class="kv-line"><span>Passenger:</span><span id="crmPassenger">Waiting for scan...</span></div>
+              <div class="kv-line"><span>Passenger:</span><span id="crmPassenger">Waiting for video stream OCR...</span></div>
               <div class="kv-line"><span>PNR / Flight:</span><span id="crmPnr">—</span></div>
               <div class="kv-line"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">—</span></div>
               <div class="kv-line"><span>Vault Location:</span><span id="crmBagLoc">—</span></div>
@@ -491,7 +505,7 @@
 
           <div class="chat-box" id="transcriptBox">
             <div class="msg-gemini">
-              <strong>[Concierge Ready]:</strong> Click <strong>"⚡ Start Live Camera & Voice Session"</strong> at the top right, hold your printed boarding pass up to the camera, and speak naturally.
+              <strong>[Continuous Video Stream Ready]:</strong> Your webcam preview is live above. Click <strong>"⚡ Start Live Video & Voice Stream"</strong>, hold your printed boarding pass in front of the camera, and speak — Gemini continuously watches your video stream (`realtimeInput.video`) without taking pictures!
             </div>
           </div>
         </div>
@@ -500,12 +514,12 @@
         <div id="tab-script" class="tab-panel">
           <div style="display:flex; flex-direction:column; gap:14px; font-size:14px; line-height:1.6;">
             <div class="info-box" style="border-left:4px solid #3b82f6;">
-              <h4 style="color:#60a5fa;">Step 1 — Hold Boarding Pass to Camera & Speak</h4>
-              "Hi Aria, my connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and claim slip on camera — PNR LH8942X, Bag Tag 0220-774910-PRIO. Can you verify my compensation entitlement and rebook me on the next Star Alliance partner flight to New York?"
+              <h4 style="color:#60a5fa;">Step 1 — Hold Printed Boarding Pass to Live Camera & Speak (Don't Even Say the PNR Out Loud!)</h4>
+              "Hi Aria, my connecting flight in Frankfurt was just canceled due to weather, and my checked luggage has a priority tag. I'm holding my boarding pass and baggage claim slip up to the camera right now — can you read my PNR and bag tag from the live video stream, check my compensation entitlement, and rebook me on the next Star Alliance flight to New York?"
             </div>
             <div class="info-box" style="border-left:4px solid #10b981;">
-              <h4 style="color:#34d399;">Step 2 — Reply While Aria Speaks Her Filler</h4>
-              "I prefer the morning departure on Lufthansa flight LH400 at 08:30 AM with Business Window Seat 04A, and here is my €245 Sheraton Frankfurt Airport hotel receipt."
+              <h4 style="color:#34d399;">Step 2 — Reply While Aria Speaks Her Conversational Filler</h4>
+              "I prefer the morning departure on Lufthansa flight LH400 at 08:30 AM with Business Window Seat 04A, and I'm holding up my €245 Sheraton Frankfurt Airport hotel receipt as well."
             </div>
           </div>
         </div>
@@ -526,8 +540,8 @@
       <div class="terminal-log" id="thinkingTerminal">
         <div class="log-entry log-status">
           <span class="log-time">[READY]</span>
-          <strong>Gemini 3.8 Live Extended Thinking Telemetry Active.</strong><br/>
-          Monitoring <code>interaction_status</code> (<code>IN_PROGRESS</code> ➔ <code>IDLE</code>), spoken conversational fillers, and asynchronous <code>NON_BLOCKING</code> SQL & Firestore execution.
+          <strong>Gemini 3.8 Live Extended Thinking Continuous Video + Audio Stream Active.</strong><br/>
+          Streaming continuous <code>realtimeInput.video</code> frames (1–2 FPS) alongside <code>realtimeInput.audio</code> (16kHz PCM) while monitoring <code>interaction_status</code> (<code>IN_PROGRESS</code> ➔ <code>IDLE</code>) and asynchronous <code>NON_BLOCKING</code> SQL execution.
         </div>
       </div>
     </aside>
@@ -536,8 +550,10 @@
   <script>
     let ws = null;
     let isConnected = false;
+    let isGeminiSetupComplete = false;
     let webcamStream = null;
     let videoStreamInterval = null;
+    let streamIntervalMs = 1000;
     let framesSentCount = 0;
 
     let audioCtx = null;
@@ -550,6 +566,8 @@
     const webcamVideo = document.getElementById('webcamVideo');
     const captureCanvas = document.getElementById('captureCanvas');
     const captureCtx = captureCanvas.getContext('2d');
+    const pipCanvas = document.getElementById('pipStreamCanvas');
+    const pipCtx = pipCanvas.getContext('2d');
 
     const fallbackSlipImage = new Image();
     fallbackSlipImage.src = '/samples/sample-fra-boarding-pass-slip.jpg';
@@ -561,34 +579,80 @@
       btnEl.classList.add('active');
     }
 
-    async function startCamera() {
+    async function populateCameraDevices(activeDeviceId) {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+        const sel = document.getElementById('cameraDeviceSelect');
+        if (videoDevices.length === 0) return;
+        sel.innerHTML = '';
+        videoDevices.forEach((dev, idx) => {
+          const opt = document.createElement('option');
+          opt.value = dev.deviceId;
+          opt.textContent = `📹 ${dev.label || 'Camera ' + (idx + 1)}`;
+          if (activeDeviceId && dev.deviceId === activeDeviceId) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      } catch (e) {
+        // Ignore enumeration errors
+      }
+    }
+
+    async function startCamera(deviceId = '') {
       const pill = document.getElementById('cameraStatePill');
       try {
-        webcamStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
-        });
+        if (webcamStream) {
+          webcamStream.getTracks().forEach((t) => t.stop());
+        }
+        const constraints = {
+          video: deviceId
+            ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+            : { width: { ideal: 1280 }, height: { ideal: 720 } }
+        };
+        webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
         webcamVideo.srcObject = webcamStream;
-        pill.textContent = '🟢 LIVE CAMERA STREAMING (1 FPS JPEG)';
+        const track = webcamStream.getVideoTracks()[0];
+        const activeId = track?.getSettings()?.deviceId || deviceId;
+        await populateCameraDevices(activeId);
+        pill.textContent = `🟢 LIVE WEBCAM ACTIVE (${track?.label || '720p HD'})`;
         return true;
       } catch (err) {
-        pill.textContent = '⚠️ WEBCAM FALLBACK ACTIVE';
+        pill.textContent = '⚠️ WEBCAM FALLBACK STREAM ACTIVE';
         return false;
       }
     }
 
-    function sendSingleVideoFrameNow() {
-      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    async function switchCameraDevice(deviceId) {
+      await startCamera(deviceId);
+    }
 
+    function updateStreamFps(newIntervalMs) {
+      streamIntervalMs = Number(newIntervalMs) || 1000;
+      const fps = Math.round(1000 / streamIntervalMs);
+      document.getElementById('pipStreamLabel').textContent = `realtimeInput.video (${fps} FPS)`;
+      if (videoStreamInterval) {
+        clearInterval(videoStreamInterval);
+        videoStreamInterval = setInterval(streamNextVideoFrame, streamIntervalMs);
+      }
+    }
+
+    function streamNextVideoFrame() {
+      // Always update local PIP monitor so user sees live un-mirrored frame feed
       if (webcamStream && webcamVideo.readyState >= 2) {
         captureCtx.drawImage(webcamVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+        pipCtx.drawImage(webcamVideo, 0, 0, pipCanvas.width, pipCanvas.height);
       } else if (fallbackSlipImage.complete) {
         captureCtx.drawImage(fallbackSlipImage, 0, 0, captureCanvas.width, captureCanvas.height);
+        pipCtx.drawImage(fallbackSlipImage, 0, 0, pipCanvas.width, pipCanvas.height);
       } else {
         return;
       }
 
+      if (!ws || ws.readyState !== WebSocket.OPEN || !isGeminiSetupComplete) return;
+
       const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.84);
       const base64Jpeg = dataUrl.split(',')[1];
+      const kbSize = Math.round((base64Jpeg.length * 0.75) / 1024);
 
       ws.send(
         JSON.stringify({
@@ -602,8 +666,24 @@
       );
 
       framesSentCount++;
-      document.getElementById('frameCounterBadge').textContent = `Frames Streamed: ${framesSentCount}`;
+      const fps = Math.round(1000 / streamIntervalMs);
+      document.getElementById('frameCounterBadge').textContent =
+        `🔴 LIVE STREAMING (${fps} FPS): ${framesSentCount} frames (${kbSize} KB/frame)`;
     }
+
+    // Start local webcam preview & PIP loop immediately on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await startCamera();
+      setInterval(() => {
+        if (!isConnected) {
+          if (webcamStream && webcamVideo.readyState >= 2) {
+            pipCtx.drawImage(webcamVideo, 0, 0, pipCanvas.width, pipCanvas.height);
+          } else if (fallbackSlipImage.complete) {
+            pipCtx.drawImage(fallbackSlipImage, 0, 0, pipCanvas.width, pipCanvas.height);
+          }
+        }
+      }, 500);
+    });
 
     function setInteractionStatus(status) {
       const badge = document.getElementById('interactionStatusBadge');
@@ -683,7 +763,7 @@
       source.onended = () => {
         if (audioCtx.currentTime >= nextPlayTime - 0.05) {
           isModelSpeaking = false;
-          document.getElementById('audioStateLabel').textContent = '🎙️ Listening — Hold boarding pass to camera & speak';
+          document.getElementById('audioStateLabel').textContent = '🔴 Streaming Live Video + Voice — Hold boarding pass & speak';
         }
       };
     }
@@ -721,27 +801,42 @@
       if (!webcamStream) await startCamera();
       if (!micStream) await startMicCapture();
 
+      isGeminiSetupComplete = false;
+      framesSentCount = 0;
       const thinkingLevel = document.getElementById('thinkingLevelSelect').value;
       const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
       ws = new WebSocket(`${wsProto}//${location.host}/ws/live?thinkingLevel=${thinkingLevel}&toolLatencyMs=1400`);
 
       ws.onopen = () => {
         isConnected = true;
-        btn.textContent = '🛑 Stop Session';
+        btn.textContent = '🛑 Stop Live Stream';
         btn.className = 'btn btn-danger';
         micBtn.disabled = false;
-
-        logToTerminal(
-          'log-status',
-          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> (<code>thinkingLevel: "${thinkingLevel}"</code>). Streaming live camera JPEG frames @ 1 FPS.`
-        );
-
-        sendSingleVideoFrameNow();
-        videoStreamInterval = setInterval(sendSingleVideoFrameNow, 1000);
+        document.getElementById('audioStateLabel').textContent = 'Connecting bidirectional video + audio stream...';
       };
 
       ws.onmessage = (evt) => {
         const data = JSON.parse(evt.data);
+
+        if (data.type === 'gemini_setup_complete') {
+          isGeminiSetupComplete = true;
+          const fps = Math.round(1000 / streamIntervalMs);
+          document.getElementById('cameraStatePill').textContent =
+            `🔴 STREAMING LIVE VIDEO TO GEMINI 3.8 (${fps} FPS realtimeInput.video)`;
+          document.getElementById('audioStateLabel').textContent =
+            '🔴 Streaming Live Video + Voice — Hold boarding pass to camera & speak';
+          logToTerminal(
+            'log-status',
+            `<strong>Bidirectional Video + Audio Stream Active (` +
+              `<code>gemini-3.8-live-extended-thinking</code> • <code>thinkingLevel: "${thinkingLevel}"</code>).</strong><br/>` +
+              `Continuously streaming live webcam frames via <code>realtimeInput.video</code> (${fps} FPS) + 16kHz PCM audio via <code>realtimeInput.audio</code>.`
+          );
+
+          streamNextVideoFrame();
+          if (videoStreamInterval) clearInterval(videoStreamInterval);
+          videoStreamInterval = setInterval(streamNextVideoFrame, streamIntervalMs);
+          return;
+        }
 
         if (data.type === 'tool_execution_start') {
           setInteractionStatus('IN_PROGRESS');
@@ -808,9 +903,11 @@
 
       ws.onclose = () => {
         isConnected = false;
+        isGeminiSetupComplete = false;
         if (videoStreamInterval) clearInterval(videoStreamInterval);
-        btn.textContent = '⚡ Start Live Camera & Voice Session';
+        btn.textContent = '⚡ Start Live Video & Voice Stream';
         btn.className = 'btn btn-primary';
+        document.getElementById('cameraStatePill').textContent = '🟢 LIVE WEBCAM ACTIVE (Ready to Stream)';
         setInteractionStatus('IDLE');
       };
     }
@@ -842,7 +939,7 @@
         const source = micCtx.createMediaStreamSource(micStream);
         micProcessor = micCtx.createScriptProcessor(4096, 1, 1);
         micProcessor.onaudioprocess = (e) => {
-          if (micMuted || !ws || ws.readyState !== WebSocket.OPEN) return;
+          if (micMuted || !ws || ws.readyState !== WebSocket.OPEN || !isGeminiSetupComplete) return;
           const inputData = e.inputBuffer.getChannelData(0);
           const pcm16 = new Int16Array(inputData.length);
           for (let i = 0; i < inputData.length; i++) {

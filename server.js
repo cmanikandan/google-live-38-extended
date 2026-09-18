@@ -87,6 +87,8 @@ wss.on('connection', (clientWs, req) => {
   )}`;
 
   const geminiWs = new WebSocket(geminiWsUrl);
+  let isSetupComplete = false;
+  let latestVideoFrameBeforeSetup = null;
 
   const sendToClient = (payload) => {
     if (clientWs.readyState === WebSocket.OPEN) {
@@ -146,6 +148,19 @@ wss.on('connection', (clientWs, req) => {
     try {
       const textData = rawData.toString('utf8');
       const message = JSON.parse(textData);
+
+      // Detect upstream Gemini Live setupComplete so continuous video streaming starts at the exact right moment
+      if (message.setupComplete || message.setup_complete) {
+        isSetupComplete = true;
+        if (latestVideoFrameBeforeSetup && geminiWs.readyState === WebSocket.OPEN) {
+          geminiWs.send(JSON.stringify(latestVideoFrameBeforeSetup));
+          latestVideoFrameBeforeSetup = null;
+        }
+        sendToClient({
+          type: 'gemini_setup_complete',
+          timestamp: new Date().toISOString()
+        });
+      }
 
       // Extract interactionStatus (supports both camelCase & snake_case)
       const interactionStatus =
@@ -238,6 +253,12 @@ wss.on('connection', (clientWs, req) => {
   clientWs.on('message', (clientRaw) => {
     try {
       const parsed = JSON.parse(clientRaw.toString('utf8'));
+      if (!isSetupComplete) {
+        if (parsed.realtimeInput?.video) {
+          latestVideoFrameBeforeSetup = parsed;
+        }
+        return;
+      }
       if (geminiWs.readyState === WebSocket.OPEN) {
         geminiWs.send(JSON.stringify(parsed));
       }
