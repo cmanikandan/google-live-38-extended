@@ -412,6 +412,10 @@
         <option value="1000" selected>🔴 Stream: 1 FPS (realtimeInput.video)</option>
         <option value="500">🔴 Stream: 2 FPS (High Motion)</option>
       </select>
+      <select id="liveModelSelect" onchange="onLiveModelChange(this.value)" title="Select Gemini 3.8 Live Model">
+        <option value="gemini-3.8-live-extended-thinking" selected>🧠 gemini-3.8-live-extended-thinking</option>
+        <option value="gemini-3.8-live">⚡ gemini-3.8-live (No Extended Thinking)</option>
+      </select>
       <select id="thinkingLevelSelect">
         <option value="HIGH" selected>thinkingLevel: HIGH</option>
         <option value="MEDIUM">thinkingLevel: MEDIUM</option>
@@ -787,6 +791,12 @@
     }
     drawWaveform();
 
+    function onLiveModelChange(modelVal) {
+      const thinkingSel = document.getElementById('thinkingLevelSelect');
+      thinkingSel.disabled = !modelVal.includes('extended-thinking');
+      thinkingSel.style.opacity = thinkingSel.disabled ? '0.45' : '1';
+    }
+
     async function toggleLiveSession() {
       const btn = document.getElementById('startSessionBtn');
       const micBtn = document.getElementById('micBtn');
@@ -803,9 +813,12 @@
 
       isGeminiSetupComplete = false;
       framesSentCount = 0;
+      const selectedModel = document.getElementById('liveModelSelect').value;
       const thinkingLevel = document.getElementById('thinkingLevelSelect').value;
       const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${wsProto}//${location.host}/ws/live?thinkingLevel=${thinkingLevel}&toolLatencyMs=1400`);
+      ws = new WebSocket(
+        `${wsProto}//${location.host}/ws/live?model=${encodeURIComponent(selectedModel)}&thinkingLevel=${thinkingLevel}&toolLatencyMs=1400`
+      );
 
       ws.onopen = () => {
         isConnected = true;
@@ -822,13 +835,15 @@
           isGeminiSetupComplete = true;
           const fps = Math.round(1000 / streamIntervalMs);
           document.getElementById('cameraStatePill').textContent =
-            `🔴 STREAMING LIVE VIDEO TO GEMINI 3.8 (${fps} FPS realtimeInput.video)`;
+            `🔴 STREAMING LIVE VIDEO TO ${selectedModel.toUpperCase()} (${fps} FPS)`;
           document.getElementById('audioStateLabel').textContent =
             '🔴 Streaming Live Video + Voice — Hold boarding pass to camera & speak';
+          const thinkingNote = selectedModel.includes('extended-thinking')
+            ? ` • <code>thinkingLevel: "${thinkingLevel}"</code>`
+            : ' • Standard Low-Latency Mode (No Extended Thinking)';
           logToTerminal(
             'log-status',
-            `<strong>Bidirectional Video + Audio Stream Active (` +
-              `<code>gemini-3.8-live-extended-thinking</code> • <code>thinkingLevel: "${thinkingLevel}"</code>).</strong><br/>` +
+            `<strong>Bidirectional Video + Audio Stream Active (<code>${selectedModel}</code>${thinkingNote}).</strong><br/>` +
               `Continuously streaming live webcam frames via <code>realtimeInput.video</code> (${fps} FPS) + 16kHz PCM audio via <code>realtimeInput.audio</code>.`
           );
 

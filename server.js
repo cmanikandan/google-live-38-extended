@@ -106,22 +106,28 @@ wss.on('connection', (clientWs, req) => {
       toolsList.push({ googleSearch: {} });
     }
 
+    const isExtendedThinkingModel = modelName.includes('extended-thinking');
+    const generationConfig = {
+      responseModalities: ['AUDIO'],
+      speechConfig: {
+        voiceConfig: {
+          prebuiltVoiceConfig: {
+            voiceName
+          }
+        }
+      }
+    };
+
+    if (isExtendedThinkingModel) {
+      generationConfig.thinkingConfig = {
+        thinkingLevel
+      };
+    }
+
     const setupFrame = {
       setup: {
         model: modelName.startsWith('models/') ? modelName : `models/${modelName}`,
-        generationConfig: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName
-              }
-            }
-          },
-          thinkingConfig: {
-            thinkingLevel
-          }
-        },
+        generationConfig,
         systemInstruction: {
           parts: [{ text: CONCIERGE_SYSTEM_INSTRUCTION }]
         },
