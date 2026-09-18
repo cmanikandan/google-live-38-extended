@@ -1,0 +1,60 @@
+{
+  "summary": "4/4 PASSED",
+  "results": [
+    {
+      "id": "EVAL-01",
+      "name": "NON_BLOCKING Tool Declarations & CRM/WorldTracer/EU261 Engine",
+      "passed": true,
+      "details": "Verified 4/4 tools declare behavior=\"NON_BLOCKING\"; PNR=LH8942X, BagTag=0220-774910-PRIO, EU261 Art.7=false, Art.9=true.",
+      "metrics": {
+        "toolCount": 4,
+        "allNonBlocking": true
+      },
+      "timestamp": "2026-09-18T05:24:34.001Z"
+    },
+    {
+      "id": "EVAL-02",
+      "name": "Visual OCR Verification of Generated Boarding Pass & IRROPS Hotel Receipt Props",
+      "passed": true,
+      "details": "OCR extracted PNR(LH8942X)=true, BagTag(0220-774910-PRIO)=true, PIR(FRALH44912)=true, SheratonFolio(EUR 245)=true.",
+      "metrics": {
+        "hasPnr": true,
+        "hasBagTag": true,
+        "hasPir": true,
+        "hasHotel": true
+      },
+      "timestamp": "2026-09-18T05:24:44.287Z"
+    },
+    {
+      "id": "EVAL-03",
+      "name": "Gemini 3.8 Live Extended Thinking WebSocket Protocol, Video Frame & NON_BLOCKING Tool Lifecycle",
+      "passed": true,
+      "details": "SessionInit=true, AudioChunks=61, ToolsCalled=[scan_boarding_pass_and_bag_tag, search_star_alliance_partner_flights, evaluate_eu261_and_vip_entitlement], sawInProgress=true, sawIdle=false.",
+      "metrics": {
+        "sessionInitialized": true,
+        "audioChunksReceived": 61,
+        "toolsTriggered": [
+          "scan_boarding_pass_and_bag_tag",
+          "search_star_alliance_partner_flights",
+          "evaluate_eu261_and_vip_entitlement"
+        ],
+        "sawInProgressStatus": true,
+        "sawIdleStatus": false
+      },
+      "timestamp": "2026-09-18T05:25:08.290Z"
+    },
+    {
+      "id": "EVAL-04",
+      "name": "Multi-Rule Legal & VIP Reasoning Rubric (EU261 Art. 5(3) vs Art. 9 + Star Alliance Gold + Morning Rebooking)",
+      "passed": true,
+      "details": "Verified all 4 reasoning rubrics: Art.5(3) Exemption=true, Art.9 €245 Hotel Care=true, VIP $350 + Priority Bag=true, Morning LH400/UA8840=true.",
+      "metrics": {
+        "art5_3_weather_exemption": true,
+        "art9_right_to_care_hotel": true,
+        "vip_goodwill_350_and_bag": true,
+        "morning_flight_lh400": true
+      },
+      "timestamp": "2026-09-18T05:25:17.140Z"
+    }
+  ]
+}

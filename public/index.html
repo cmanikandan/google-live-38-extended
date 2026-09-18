@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tier-3 Enterprise Contact Center Concierge — Gemini 3.8 Live Extended Thinking</title>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --panel-bg: #0f172a;
+      --panel-border: #1e293b;
+      --accent-blue: #3b82f6;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-purple: #8b5cf6;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* Top Header */
+    header {
+      height: 62px;
+      background: #0b1120;
+      border-bottom: 1px solid var(--panel-border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .brand span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .controls-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    select, input[type="password"] {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+    }
+    .btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: #334155; }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-danger {
+      background: #dc2626;
+      border-color: #ef4444;
+    }
+    .btn-amber {
+      background: #d97706;
+      border-color: #f59e0b;
+      color: #fff;
+    }
+    .btn-emerald {
+      background: #059669;
+      border-color: #10b981;
+      color: #fff;
+    }
+
+    /* Main Split Screen */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 52% 48%;
+      flex: 1;
+      min-height: 0;
+    }
+    .pane-left {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      border-right: 1px solid var(--panel-border);
+    }
+    .pane-right {
+      background: #050811;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Video / Camera Stage */
+    .video-stage-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .stage-header {
+      padding: 10px 14px;
+      background: #131c31;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .video-viewport {
+      position: relative;
+      height: 255px;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #webcamVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    #visionCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .camera-overlay-pill {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: #38bdf8;
+    }
+    .prop-toolbar {
+      padding: 10px 14px;
+      background: #0b1324;
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Audio Waveform & Model State Card */
+    .waveform-state-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .state-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .status-badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-idle {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid #10b981;
+    }
+    .status-in-progress {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid #f59e0b;
+      animation: pulseGlow 1.4s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 14px 4px rgba(245, 158, 11, 0.35); }
+    }
+    #waveformCanvas {
+      width: 100%;
+      height: 46px;
+      background: #050a14;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+    }
+
+    /* Guided Demo Script & Conversation Box */
+    .conversation-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .demo-action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .chat-transcript {
+      max-height: 150px;
+      overflow-y: auto;
+      background: #060b16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .msg-user {
+      color: #93c5fd;
+      border-left: 3px solid #3b82f6;
+      padding-left: 8px;
+    }
+    .msg-gemini {
+      color: #fde68a;
+      border-left: 3px solid #f59e0b;
+      padding-left: 8px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .input-row input {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: white;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    /* Live CRM & EU261 Resolution Cards */
+    .crm-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .crm-card {
+      background: #111c33;
+      border: 1px solid #263859;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+    }
+    .crm-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #38bdf8;
+    }
+    .crm-kv {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.15);
+      padding-bottom: 4px;
+    }
+    .crm-kv span:first-child { color: #94a3b8; }
+    .crm-kv span:last-child { font-weight: 700; font-family: var(--mono); }
+
+    /* Right Pane: Extended Thinking Terminal */
+    .terminal-header {
+      padding: 12px 16px;
+      background: #0b1324;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .terminal-title {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .terminal-log {
+      flex: 1;
+      padding: 14px 16px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .log-entry {
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      border-left: 3px solid #475569;
+      word-break: break-word;
+    }
+    .log-thinking { border-left-color: #a855f7; background: rgba(88, 28, 135, 0.18); color: #e9d5ff; }
+    .log-tool-call { border-left-color: #f59e0b; background: rgba(120, 53, 15, 0.22); color: #fde68a; }
+    .log-tool-res { border-left-color: #10b981; background: rgba(6, 78, 59, 0.22); color: #a7f3d0; }
+    .log-status { border-left-color: #38bdf8; background: rgba(12, 74, 110, 0.25); color: #bae6fd; }
+    .log-filler { border-left-color: #ec4899; background: rgba(131, 24, 67, 0.2); color: #fbcfe8; }
+    .log-time {
+      color: #64748b;
+      font-size: 10px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="brand-badge">GEMINI 3.8 LIVE EXTENDED THINKING</span>
+      <div>
+        <h1>Tier-3 Enterprise Contact Center Concierge</h1>
+        <span>Star Alliance VIP Desk • Real-Time Video OCR + Spoken Fillers + Non-Blocking Multi-Tool CRM</span>
+      </div>
+    </div>
+    <div class="controls-top">
+      <label style="font-size:11px; color:#94a3b8;">Thinking Level:</label>
+      <select id="thinkingLevelSelect">
+        <option value="HIGH" selected>thinkingLevel: HIGH (Deep Policy & Multi-Tool)</option>
+        <option value="MEDIUM">thinkingLevel: MEDIUM</option>
+        <option value="LOW">thinkingLevel: LOW</option>
+      </select>
+      <a class="btn" href="/samples/printable-demo-kit.html" target="_blank">📄 Open Printable Boarding Pass Kit</a>
+      <button id="connectBtn" class="btn btn-primary" onclick="toggleConnection()">⚡ Connect Live Session</button>
+      <button id="micBtn" class="btn" onclick="toggleMic()" disabled>🎙️ Start Mic</button>
+    </div>
+  </header>
+
+  <div class="split-layout">
+    <!-- LEFT PANE: VIDEO FEED + WAVEFORM + CONVERSATION + CRM CARDS -->
+    <div class="pane-left">
+      <!-- 1. LIVE WEBCAM / SLIP VISION FEED -->
+      <div class="video-stage-card">
+        <div class="stage-header">
+          <span>📹 LIVE WEBCAM / BOARDING PASS & CLAIM SLIP VISION FEED (1 FPS JPEG Stream)</span>
+          <span id="frameCounterBadge" style="font-family:var(--mono); color:#38bdf8;">Frames Sent: 0</span>
+        </div>
+        <div class="video-viewport">
+          <video id="webcamVideo" autoplay playsinline muted></video>
+          <canvas id="visionCanvas" width="760" height="420"></canvas>
+          <div class="camera-overlay-pill" id="activeVisualSourceLabel">
+            SOURCE: PROP #1 (LUFTHANSA BOARDING PASS + PRIORITY BAG SLIP LH8942X)
+          </div>
+        </div>
+        <div class="prop-toolbar">
+          <button class="btn btn-amber" onclick="loadSampleProp('boarding_pass')">
+            🎫 Project Prop 1: Boarding Pass & Priority Bag Slip (LH8942X)
+          </button>
+          <button class="btn" onclick="loadSampleProp('hotel_receipt')">
+            🧾 Project Prop 2: FRA IRROPS & €245 Sheraton Hotel Receipt
+          </button>
+          <button class="btn" id="webcamToggleBtn" onclick="toggleWebcam()">
+            📷 Enable Live Webcam
+          </button>
+          <button class="btn btn-emerald" onclick="transmitCurrentFrameToGemini()">
+            📤 Send Visual Frame Now
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. AUDIO WAVEFORM + INTERACTION_STATUS INDICATOR -->
+      <div class="waveform-state-card">
+        <div class="state-row">
+          <div>
+            <div style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase;">
+              Audio Waveform & Spoken Filler Telemetry
+            </div>
+            <div id="audioStateLabel" style="font-size:13px; font-weight:600; color:#e2e8f0; margin-top:2px;">
+              Ready — Connect session to stream 24kHz native audio
+            </div>
+          </div>
+          <div>
+            <span style="font-size:11px; color:#94a3b8; margin-right:6px;">interaction_status:</span>
+            <span id="interactionStatusBadge" class="status-badge status-idle">
+              ● IDLE (WAITING FOR INPUT)
+            </span>
+          </div>
+        </div>
+        <canvas id="waveformCanvas" width="680" height="46"></canvas>
+      </div>
+
+      <!-- 3. DEMO INTERACTION TRIGGERS & LIVE TRANSCRIPT -->
+      <div class="conversation-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:12px; font-weight:700; color:#fbbf24;">
+            🎬 ONE-CLICK STAGE DEMO ACTIONS (Or Speak Directly Into Your Microphone)
+          </span>
+          <span style="font-size:11px; color:#94a3b8;">Sends Video Frame + Prompt to Gemini 3.8 Live</span>
+        </div>
+        <div class="demo-action-buttons">
+          <button class="btn btn-primary" onclick="triggerDemoTurn1()">
+            1️⃣ Show Boarding Pass Slip & Ask: "My Frankfurt flight was canceled due to weather..."
+          </button>
+          <button class="btn btn-emerald" onclick="triggerDemoTurn2()">
+            2️⃣ Reply Preference: "I prefer the Morning departure (08:30 LH400) with Window Seat 04A."
+          </button>
+        </div>
+
+        <div class="chat-transcript" id="transcriptBox">
+          <div class="msg-gemini">
+            <strong>[System Ready]:</strong> Click <strong>"⚡ Connect Live Session"</strong>, then either speak into your microphone while holding up the slip, or click <strong>Button 1️⃣</strong> to transmit the Boarding Pass JPEG frame + customer escalation prompt.
+          </div>
+        </div>
+
+        <div class="input-row">
+          <input
+            type="text"
+            id="manualTextInput"
+            placeholder="Or type a spoken utterance to send via realtimeInput.text..."
+            onkeydown="if(event.key==='Enter') sendManualText()"
+          />
+          <button class="btn btn-primary" onclick="sendManualText()">Send Turn</button>
+        </div>
+      </div>
+
+      <!-- 4. LIVE CRM & EU261 RESOLUTION LEDGER -->
+      <div class="crm-cards-grid">
+        <div class="crm-card">
+          <h4>🧳 WorldTracer & PNR OCR Extraction</h4>
+          <div class="crm-kv"><span>Passenger:</span><span id="crmPassenger">MANIKANDAN / C (1K / GOLD)</span></div>
+          <div class="crm-kv"><span>PNR / Disrupted:</span><span id="crmPnr">LH8942X (LH401 FRA-JFK)</span></div>
+          <div class="crm-kv"><span>Priority Bag Tag:</span><span id="crmBagTag" style="color:#fbbf24;">0220-774910-PRIO</span></div>
+          <div class="crm-kv"><span>Bag Location:</span><span id="crmBagLoc">FRA T1 Vault (Auto-Retag Ready)</span></div>
+        </div>
+        <div class="crm-card">
+          <h4>⚖️ EU261 & Star Alliance VIP Entitlement</h4>
+          <div class="crm-kv"><span>EU261 Art. 7 (€600 Cash):</span><span id="crmArt7" style="color:#f87171;">EXEMPT (Art. 5(3) WX84 Weather)</span></div>
+          <div class="crm-kv"><span>EU261 Art. 9 (Hotel/Care):</span><span id="crmArt9" style="color:#34d399;">ELIGIBLE (€245 Hotel + €45 Meals)</span></div>
+          <div class="crm-kv"><span>VIP 1K Goodwill Override:</span><span id="crmVip" style="color:#38bdf8;">$350 Voucher + 25,000 Miles</span></div>
+          <div class="crm-kv"><span>Rebooked Flight:</span><span id="crmRebooked" style="color:#a7f3d0;">Awaiting Morning/Evening Pref...</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANE: BACKGROUND AGENT REASONING (EXTENDED THINKING TERMINAL) -->
+    <div class="pane-right">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <span>🧠 Background Agent Reasoning (Extended Thinking Terminal)</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-family:var(--mono); font-size:11px; background:#1e293b; padding:4px 8px; border-radius:6px; color:#c084fc;">
+            behavior: "NON_BLOCKING"
+          </span>
+          <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="clearTerminal()">Clear</button>
+        </div>
+      </div>
+      <div class="terminal-log" id="thinkingTerminal">
+        <div class="log-entry log-status">
+          <span class="log-time">[BOOT]</span>
+          <strong>Gemini 3.8 Live Extended Thinking Telemetry Inspector Initialized.</strong><br/>
+          Monitoring <code>interaction_status</code> (<code>IN_PROGRESS</code> vs <code>IDLE</code>), spoken conversational fillers, <code>thinkingConfig.thinkingLevel</code> thoughts, and asynchronous <code>NON_BLOCKING</code> CRM tool execution.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    let isConnected = false;
+    let currentProp = 'boarding_pass';
+    let webcamStream = null;
+    let videoInterval = null;
+    let framesSentCount = 0;
+
+    // Audio playback & mic capture state
+    let audioCtx = null;
+    let nextPlayTime = 0;
+    let isModelSpeaking = false;
+    let micStream = null;
+    let micProcessor = null;
+
+    const visionCanvas = document.getElementById('visionCanvas');
+    const visionCtx = visionCanvas.getContext('2d');
+    const webcamVideo = document.getElementById('webcamVideo');
+
+    const propImages = {
+      boarding_pass: new Image(),
+      hotel_receipt: new Image()
+    };
+    propImages.boarding_pass.src = '/samples/sample-fra-boarding-pass-slip.jpg';
+    propImages.hotel_receipt.src = '/samples/sample-fra-hotel-pir-receipt.jpg';
+
+    propImages.boarding_pass.onload = () => {
+      if (currentProp === 'boarding_pass') renderVisionCanvas();
+    };
+
+    function renderVisionCanvas() {
+      visionCtx.fillStyle = '#020617';
+      visionCtx.fillRect(0, 0, visionCanvas.width, visionCanvas.height);
+
+      if (webcamStream && !webcamVideo.paused) {
+        visionCtx.drawImage(webcamVideo, 0, 0, visionCanvas.width, visionCanvas.height);
+        // Also draw the active slip in the bottom-right corner as a held-up card overlay
+        const img = propImages[currentProp];
+        if (img && img.complete) {
+          visionCtx.save();
+          visionCtx.strokeStyle = '#f59e0b';
+          visionCtx.lineWidth = 3;
+          visionCtx.drawImage(img, visionCanvas.width - 330, visionCanvas.height - 230, 315, 215);
+          visionCtx.strokeRect(visionCanvas.width - 330, visionCanvas.height - 230, 315, 215);
+          visionCtx.restore();
+        }
+      } else {
+        const img = propImages[currentProp];
+        if (img && img.complete) {
+          const scale = Math.min(visionCanvas.width / img.width, visionCanvas.height / img.height);
+          const w = img.width * scale;
+          const h = img.height * scale;
+          const x = (visionCanvas.width - w) / 2;
+          const y = (visionCanvas.height - h) / 2;
+          visionCtx.drawImage(img, x, y, w, h);
+        }
+      }
+    }
+
+    setInterval(renderVisionCanvas, 120);
+
+    function loadSampleProp(propKey) {
+      currentProp = propKey;
+      const label = document.getElementById('activeVisualSourceLabel');
+      if (propKey === 'boarding_pass') {
+        label.textContent = 'SOURCE: PROP #1 (LUFTHANSA BOARDING PASS + PRIORITY BAG SLIP LH8942X)';
+      } else {
+        label.textContent = 'SOURCE: PROP #2 (FRANKFURT IRROPS SLIP + €245 SHERATON HOTEL RECEIPT)';
+      }
+      renderVisionCanvas();
+      logToTerminal(
+        'log-status',
+        `Switched camera visual prop to [${propKey.toUpperCase()}]. Ready to stream JPEG via realtimeInput.video.`
+      );
+      if (isConnected) {
+        transmitCurrentFrameToGemini();
+      }
+    }
+
+    async function toggleWebcam() {
+      const btn = document.getElementById('webcamToggleBtn');
+      if (webcamStream) {
+        webcamStream.getTracks().forEach((t) => t.stop());
+        webcamStream = null;
+        btn.textContent = '📷 Enable Live Webcam';
+        return;
+      }
+      try {
+        webcamStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 } });
+        webcamVideo.srcObject = webcamStream;
+        btn.textContent = '🛑 Stop Live Webcam';
+        logToTerminal('log-status', 'Live Webcam enabled with Picture-in-Picture Boarding Pass overlay.');
+      } catch (err) {
+        logToTerminal('log-tool-call', `Webcam access denied or unavailable (${err.message}). Using high-res virtual slip feed.`);
+      }
+    }
+
+    function transmitCurrentFrameToGemini() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        logToTerminal('log-tool-call', 'Connect the Live Session first before transmitting video frames.');
+        return;
+      }
+      renderVisionCanvas();
+      const dataUrl = visionCanvas.toDataURL('image/jpeg', 0.82);
+      const base64Jpeg = dataUrl.split(',')[1];
+
+      ws.send(
+        JSON.stringify({
+          realtimeInput: {
+            video: {
+              mimeType: 'image/jpeg',
+              data: base64Jpeg
+            }
+          }
+        })
+      );
+
+      framesSentCount++;
+      document.getElementById('frameCounterBadge').textContent = `Frames Sent: ${framesSentCount}`;
+      logToTerminal(
+        'log-status',
+        `-> [Video OCR Frame Sent]: realtimeInput.video (${currentProp}.jpg, ${(base64Jpeg.length / 1024).toFixed(1)} KB)`
+      );
+    }
+
+    function setInteractionStatus(status) {
+      const badge = document.getElementById('interactionStatusBadge');
+      if (status === 'IN_PROGRESS') {
+        badge.className = 'status-badge status-in-progress';
+        badge.innerHTML = '⚡ IN_PROGRESS (THINKING & RUNNING NON_BLOCKING TOOLS)';
+      } else if (status === 'IDLE') {
+        badge.className = 'status-badge status-idle';
+        badge.innerHTML = '● IDLE (SYNTHESIS COMPLETE / LISTENING)';
+      }
+    }
+
+    function logToTerminal(cssClass, htmlContent) {
+      const term = document.getElementById('thinkingTerminal');
+      const div = document.createElement('div');
+      div.className = `log-entry ${cssClass}`;
+      const now = new Date().toLocaleTimeString('en-US', { hour12: false }) + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+      div.innerHTML = `<span class="log-time">[${now}]</span>${htmlContent}`;
+      term.appendChild(div);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function clearTerminal() {
+      document.getElementById('thinkingTerminal').innerHTML = '';
+    }
+
+    function appendTranscript(speaker, text) {
+      const box = document.getElementById('transcriptBox');
+      const div = document.createElement('div');
+      div.className = speaker === 'user' ? 'msg-user' : 'msg-gemini';
+      div.innerHTML = `<strong>${speaker === 'user' ? 'Passenger (You)' : 'Gemini Concierge (Aria)'}:</strong> ${text}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function ensureAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        nextPlayTime = audioCtx.currentTime;
+      }
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+    }
+
+    function playPcm24kChunk(base64Data) {
+      ensureAudioContext();
+      const binaryString = atob(base64Data);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const int16 = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(int16.length);
+      for (let i = 0; i < int16.length; i++) {
+        float32[i] = int16[i] / 32768.0;
+      }
+
+      const buffer = audioCtx.createBuffer(1, float32.length, 24000);
+      buffer.getChannelData(0).set(float32);
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      if (nextPlayTime < now) nextPlayTime = now;
+      source.start(nextPlayTime);
+      nextPlayTime += buffer.duration;
+
+      isModelSpeaking = true;
+      document.getElementById('audioStateLabel').textContent = '🔊 Streaming 24kHz Native Audio (Spoken Filler / Synthesis Active)...';
+      source.onended = () => {
+        if (audioCtx.currentTime >= nextPlayTime - 0.05) {
+          isModelSpeaking = false;
+          document.getElementById('audioStateLabel').textContent = '🎙️ Listening for passenger voice or visual slip...';
+        }
+      };
+    }
+
+    // Animated Audio Waveform
+    const waveCanvas = document.getElementById('waveformCanvas');
+    const waveCtx = waveCanvas.getContext('2d');
+    function drawWaveform() {
+      waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+      const barCount = 56;
+      const barWidth = (waveCanvas.width - barCount * 3) / barCount;
+      for (let i = 0; i < barCount; i++) {
+        const activeAmp = isModelSpeaking
+          ? Math.max(6, Math.sin(Date.now() / 75 + i * 0.45) * 18 + Math.random() * 16)
+          : 4 + Math.sin(Date.now() / 300 + i * 0.2) * 2;
+        const x = i * (barWidth + 3);
+        const y = (waveCanvas.height - activeAmp) / 2;
+        waveCtx.fillStyle = isModelSpeaking ? '#f59e0b' : '#334155';
+        waveCtx.fillRect(x, y, barWidth, activeAmp);
+      }
+      requestAnimationFrame(drawWaveform);
+    }
+    drawWaveform();
+
+    async function toggleConnection() {
+      const btn = document.getElementById('connectBtn');
+      const micBtn = document.getElementById('micBtn');
+      if (isConnected && ws) {
+        ws.close();
+        return;
+      }
+
+      await ensureAudioContext();
+      const thinkingLevel = document.getElementById('thinkingLevelSelect').value;
+      const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${wsProto}//${location.host}/ws/live?thinkingLevel=${thinkingLevel}&toolLatencyMs=1600`);
+
+      ws.onopen = () => {
+        isConnected = true;
+        btn.textContent = '🔌 Disconnect Session';
+        btn.className = 'btn btn-danger';
+        micBtn.disabled = false;
+        logToTerminal(
+          'log-status',
+          `Connected to <strong>gemini-3.8-live-extended-thinking</strong> with <code>thinkingLevel: "${thinkingLevel}"</code> and 4 <code>NON_BLOCKING</code> CRM tools.`
+        );
+        // Automatically send the initial visual frame of the boarding pass slip
+        setTimeout(() => transmitCurrentFrameToGemini(), 600);
+      };
+
+      ws.onmessage = (evt) => {
+        const data = JSON.parse(evt.data);
+
+        if (data.type === 'session_init') {
+          logToTerminal(
+            'log-thinking',
+            `-> [Session Setup]: Model=<code>${data.model}</code> | Thinking=<code>${data.thinkingLevel}</code> | Tools=<code>[${data.tools.join(', ')}] + GoogleSearch</code>`
+          );
+          return;
+        }
+
+        if (data.type === 'tool_execution_start') {
+          setInteractionStatus('IN_PROGRESS');
+          logToTerminal(
+            'log-tool-call',
+            `-> <strong>[Tool Call: NON_BLOCKING]</strong>: <code>${data.name}(${JSON.stringify(data.args)})</code><br/><span style="color:#fbbf24;">interaction_status="IN_PROGRESS" — Model continues conversing while background CRM/RAG executes...</span>`
+          );
+          return;
+        }
+
+        if (data.type === 'tool_execution_complete') {
+          logToTerminal(
+            'log-tool-res',
+            `-> <strong>[Tool Result: ${data.result.status}]</strong>: <code>${data.name}</code> completed in <strong>${data.result._execution_time_ms}ms</strong><br/><pre style="margin:4px 0 0 0; font-size:10px; color:#d1fae5; white-space:pre-wrap;">${JSON.stringify(data.result, null, 2)}</pre>`
+          );
+          updateCrmUiFromTool(data.name, data.result);
+          return;
+        }
+
+        if (data.type === 'gemini_message') {
+          if (data.interactionStatus) {
+            setInteractionStatus(data.interactionStatus);
+            logToTerminal(
+              'log-status',
+              `-> <strong>[Lifecycle Signal]</strong>: <code>interaction_status = "${data.interactionStatus}"</code> ${
+                data.message.serverContent?.turnComplete ? '(turnComplete: true)' : ''
+              }`
+            );
+          }
+
+          const sc = data.message.serverContent || data.message.server_content;
+          if (sc) {
+            const parts = sc.modelTurn?.parts || sc.model_turn?.parts || [];
+            for (const part of parts) {
+              if (part.thought || part.text) {
+                logToTerminal(
+                  'log-thinking',
+                  `-> <strong>[Thinking (${document.getElementById('thinkingLevelSelect').value})]</strong>: ${part.text}`
+                );
+              }
+              const inline = part.inlineData || part.inline_data;
+              if (inline && inline.data) {
+                playPcm24kChunk(inline.data);
+              }
+            }
+
+            const outTr = sc.outputTranscription || sc.output_transcription;
+            if (outTr?.text) {
+              appendTranscript('gemini', outTr.text);
+              if (data.interactionStatus === 'IN_PROGRESS') {
+                logToTerminal(
+                  'log-filler',
+                  `-> <strong>[Spoken Filler While Thinking]</strong>: "${outTr.text}"`
+                );
+              }
+            }
+
+            const inTr = sc.inputTranscription || sc.input_transcription;
+            if (inTr?.text) {
+              appendTranscript('user', inTr.text);
+            }
+          }
+        }
+      };
+
+      ws.onclose = () => {
+        isConnected = false;
+        btn.textContent = '⚡ Connect Live Session';
+        btn.className = 'btn btn-primary';
+        micBtn.disabled = true;
+        setInteractionStatus('IDLE');
+        logToTerminal('log-status', 'Live session closed.');
+      };
+    }
+
+    function updateCrmUiFromTool(name, res) {
+      if (name === 'scan_boarding_pass_and_bag_tag' && res.passenger) {
+        document.getElementById('crmPassenger').textContent = res.passenger.name;
+        document.getElementById('crmPnr').textContent = `${res.pnr} (${res.disrupted_segment.flight})`;
+        document.getElementById('crmBagTag').textContent = res.worldtracer_baggage.bag_tag_number;
+        document.getElementById('crmBagLoc').textContent = res.worldtracer_baggage.current_location;
+      }
+      if (name === 'evaluate_eu261_and_vip_entitlement' && res.legal_and_policy_determination) {
+        document.getElementById('crmArt7').textContent = 'EXEMPT (Art. 5(3) WX84 Weather)';
+        document.getElementById('crmArt9').textContent = 'APPROVED (€245 Hotel + €45 Meals)';
+        document.getElementById('crmVip').textContent = '$350 Goodwill + 25,000 Miles + Lounge';
+      }
+      if (name === 'issue_rebooking_and_compensation_package' && res.rebooked_itinerary) {
+        document.getElementById('crmRebooked').textContent =
+          `${res.rebooked_itinerary.flight_number} • ${res.rebooked_itinerary.departure_time} • Seat ${res.rebooked_itinerary.confirmed_seat}`;
+      }
+    }
+
+    async function triggerDemoTurn1() {
+      if (!isConnected) {
+        await toggleConnection();
+        await new Promise((r) => setTimeout(r, 900));
+      }
+      loadSampleProp('boarding_pass');
+      transmitCurrentFrameToGemini();
+      const promptText =
+        'My connecting flight LH401 in Frankfurt was canceled due to weather, and my luggage has a Star Alliance priority tag. Here is my boarding pass and baggage claim slip on camera (PNR LH8942X, Bag Tag 0220-774910-PRIO). Can you verify my EU261 and VIP compensation entitlement and rebook me on the next Star Alliance partner flight to New York?';
+      appendTranscript('user', promptText);
+      logToTerminal('log-thinking', '-> [Thinking]: Formulating multi-step OCR + Flight Inventory + EU261 Policy verification strategy...');
+      ws.send(
+        JSON.stringify({
+          realtimeInput: {
+            text: promptText
+          }
+        })
+      );
+    }
+
+    async function triggerDemoTurn2() {
+      if (!isConnected) return;
+      const prefText =
+        'I prefer the Morning departure on Lufthansa LH400 (codeshare UA8840) at 08:30 with Upper Deck Business Window Seat 04A. Please finalize the rebooking, transfer my priority bag 0220-774910-PRIO, and issue the EU261 Article 9 hotel reimbursement and VIP voucher.';
+      appendTranscript('user', prefText);
+      ws.send(
+        JSON.stringify({
+          realtimeInput: {
+            text: prefText
+          }
+        })
+      );
+    }
+
+    function sendManualText() {
+      const input = document.getElementById('manualTextInput');
+      const text = input.value.trim();
+      if (!text || !isConnected) return;
+      appendTranscript('user', text);
+      ws.send(
+        JSON.stringify({
+          realtimeInput: {
+            text
+          }
+        })
+      );
+      input.value = '';
+    }
+
+    async function toggleMic() {
+      const micBtn = document.getElementById('micBtn');
+      if (micStream) {
+        micStream.getTracks().forEach((t) => t.stop());
+        micStream = null;
+        if (micProcessor) micProcessor.disconnect();
+        micBtn.textContent = '🎙️ Start Mic';
+        return;
+      }
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+        const micCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+        const source = micCtx.createMediaStreamSource(micStream);
+        micProcessor = micCtx.createScriptProcessor(4096, 1, 1);
+        micProcessor.onaudioprocess = (e) => {
+          if (!ws || ws.readyState !== WebSocket.OPEN) return;
+          const inputData = e.inputBuffer.getChannelData(0);
+          const pcm16 = new Int16Array(inputData.length);
+          for (let i = 0; i < inputData.length; i++) {
+            pcm16[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+          }
+          const bytes = new Uint8Array(pcm16.buffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          ws.send(
+            JSON.stringify({
+              realtimeInput: {
+                audio: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: btoa(binary)
+                }
+              }
+            })
+          );
+        };
+        source.connect(micProcessor);
+        micProcessor.connect(micCtx.destination);
+        micBtn.textContent = '🛑 Mute Mic';
+        logToTerminal('log-status', 'Microphone streaming 16kHz PCM audio to Gemini 3.8 Live Extended Thinking.');
+      } catch (err) {
+        logToTerminal('log-tool-call', `Microphone error: ${err.message}`);
+      }
+    }
+  </script>
+</body>
+</html>

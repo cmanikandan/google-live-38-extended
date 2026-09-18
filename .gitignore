@@ -1,0 +1,13 @@
+# Environment and secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# OS & Editor files
+.DS_Store
+*.log
+npm-debug.log*
+evals/latest-eval-run.json

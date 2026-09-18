@@ -1,0 +1,18 @@
+{
+  "name": "gemini-38-live-extended-thinking-concierge",
+  "version": "1.0.0",
+  "description": "Tier-3 Enterprise Contact Center Concierge showcasing Gemini 3.8 Live Extended Thinking (Video OCR + Spoken Fillers + Non-Blocking Multi-Tool CRM/EU261/Flight Inventory + Google Search Grounding)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "eval": "node evals/run_evals.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "ws": "^8.18.1"
+  }
+}
