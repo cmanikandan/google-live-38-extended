@@ -1,0 +1,11 @@
+node_modules
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+*.log
+npm-debug.log*
+evals/latest-eval-run.json
+data/*.db-wal
+data/*.db-shm

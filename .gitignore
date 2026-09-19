@@ -11,5 +11,7 @@ node_modules/
 *.log
 npm-debug.log*
 evals/latest-eval-run.json
+data/*.db
 data/*.db-wal
 data/*.db-shm
+
