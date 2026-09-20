@@ -5,6 +5,8 @@
 **Repository**: `google-live-38-extended` (`gemini-38-live-extended-thinking-concierge`)  
 **Domain**: Tier-3 Enterprise Airline Contact Center VIP Concierge (Star Alliance / Lufthansa / United 1K IRROPS Escalation)
 
+> **Disclaimer**: All airline names, hotel brands, loyalty programs, flight numbers, PNRs, baggage records, and receipts in this project are **fictitious/synthetic and provided strictly for technical demonstration purposes**.
+
 This project is an end-to-end reference architecture demonstrating **Gemini 3.8 Live Extended Thinking (`gemini-3.8-live-extended-thinking`)** alongside **`gemini-3.8-live`** (standard ultra-low-latency Live model without extended thinking) and **`gemini-3.8-flash`** (multimodal OCR and LLM rubric evaluation).
 
 ### Core Capabilities Demonstrated

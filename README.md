@@ -2,6 +2,10 @@
 
 > **Principal Architect Reference Implementation:** Side-by-side comparison and live enterprise orchestration of **`gemini-3.8-live-extended-thinking`** (Extended Thinking + Spoken Conversational Fillers + `interaction_status` State Machine) vs. **`gemini-3.8-live`** (Standard Ultra-Low-Latency Live Model without Extended Thinking), paired with **`gemini-3.8-flash`** for multimodal visual evaluation and backed by **Google Cloud BigQuery (`US`) + Cloud Firestore (`nam5`) + SQLite ACID**.
 
+> [!IMPORTANT]
+> **Disclaimer — For Demonstration Purposes Only:**  
+> All airline names, alliance names, hotel brands, loyalty tiers (e.g., Star Alliance, Lufthansa, United Airlines, Swiss, Sheraton, WorldTracer), flight numbers (`LH401`, `LH400`, `UA961`), PNR codes (`LH8942X`), baggage tags (`0220-774910-PRIO`), passenger records, and policy scenarios featured in this repository are **entirely synthetic and used strictly for technical demonstration and educational purposes**. This project is not affiliated with, endorsed by, or connected to any real airline, hotel, or aviation organization.
+
 ---
 
 ## 📚 Official Documentation, Model References & Blogs
