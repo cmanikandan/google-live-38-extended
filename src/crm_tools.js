@@ -3,7 +3,7 @@
  * for Gemini 3.8 Live Extended Thinking.
  *
  * Backed by `src/database_backend.js` (Google Cloud BigQuery + Firestore in project
- * `your-gcp-project-id` with persistent SQLite ACID relational synchronization).
+ * `GCP_PROJECT_ID` with persistent SQLite ACID relational synchronization).
  */
 
 import {

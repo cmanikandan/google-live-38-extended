@@ -96,15 +96,16 @@ Instead of static mocks, all 4 `NON_BLOCKING` tools execute real parameterized S
 
 | Storage Layer | GCP Project / Resource | Region / Location | Role in Concierge Tool Execution |
 | :--- | :--- | :--- | :--- |
-| **Google Cloud BigQuery** (`@google-cloud/bigquery`) | Project: `your-gcp-project-id`<br/>Dataset: `star_alliance_concierge`<br/>• `pnr_baggage_records`<br/>• `star_alliance_flight_inventory`<br/>• `eu261_policy_rules` | **`US` Multi-Region** (`location: 'US'`) | Cloud analytical & operational tables storing passenger PNRs, WorldTracer priority bag locations, Star Alliance seat availability, and EU261 Article 5(3)/Article 9 rules. |
-| **Google Cloud Firestore** (`@google-cloud/firestore`) | Project: `your-gcp-project-id`<br/>Database: `(default)`<br/>Collection: `concierge_rebookings` | **`nam5` (`us-central1` Multi-Region)** | Cloud NoSQL document store recording confirmed ACID rebooking transactions (`TXN-...`), €245 hotel reimbursements, and $350 VIP goodwill vouchers. |
+| **Google Cloud BigQuery** (`@google-cloud/bigquery`) | Project: `<YOUR_GCP_PROJECT_ID>`<br/>Dataset: `star_alliance_concierge`<br/>• `pnr_baggage_records`<br/>• `star_alliance_flight_inventory`<br/>• `eu261_policy_rules` | **`US` Multi-Region** (`location: 'US'`) | Cloud analytical & operational tables storing passenger PNRs, WorldTracer priority bag locations, Star Alliance seat availability, and EU261 Article 5(3)/Article 9 rules. |
+| **Google Cloud Firestore** (`@google-cloud/firestore`) | Project: `<YOUR_GCP_PROJECT_ID>`<br/>Database: `(default)`<br/>Collection: `concierge_rebookings` | **`nam5` (`us-central1` Multi-Region)** | Cloud NoSQL document store recording confirmed ACID rebooking transactions (`TXN-...`), €245 hotel reimbursements, and $350 VIP goodwill vouchers. |
 | **Synchronized Local SQLite ACID Store** (`better-sqlite3`) | File: `data/concierge_enterprise.db` (WAL mode) | **Local Persistent Disk** | Always-on local relational SQL engine that executes every parameterized `SELECT`, `INSERT`, and `UPDATE` in real time and automatically syncs with BigQuery (`US`) and Firestore (`nam5`) when `gcloud` Application Default Credentials (ADC) are active. |
 
 ### Provisioning / Syncing Remote BigQuery (`US`) & Firestore (`nam5`) Tables
-To authenticate your workstation's Application Default Credentials (ADC) and seed the remote cloud tables in `your-gcp-project-id`:
+To authenticate your workstation's Application Default Credentials (ADC) and seed the remote cloud tables in your Google Cloud project:
 ```bash
 gcloud auth application-default login
 gcloud config set project your-gcp-project-id
+export GCP_PROJECT_ID=your-gcp-project-id
 npm run seed:gcp
 ```
 
@@ -125,7 +126,7 @@ Open **[`http://localhost:3080/samples/printable-demo-kit.html`](http://localhos
 ### 1. Install Dependencies & Configure `.env`
 ```bash
 cp .env.example .env
-# Add your GEMINI_API_KEY in .env
+# Add your GEMINI_API_KEY and GCP_PROJECT_ID in .env
 npm install
 ```
 
@@ -141,8 +142,9 @@ npm start
 ```bash
 npm run eval
 ```
-Executes [`evals/run_evals.js`](evals/run_evals.js) using both `gemini-3.8-flash` and `gemini-3.8-live-extended-thinking`:
+Executes [`evals/run_evals.js`](evals/run_evals.js) using both `gemini-3.8-flash` and `gemini-3.8-live-extended-thinking` (results saved to [`evals/eval_report.json`](evals/eval_report.json)):
 * **EVAL-01 (`NON_BLOCKING` Schema & SQL Engine Verification)**: Validates `behavior: "NON_BLOCKING"` across all 4 tool declarations and verifies parameterized SQL execution (`SELECT` / `INSERT` / `UPDATE`).
 * **EVAL-02 (`gemini-3.8-flash` Visual OCR Accuracy)**: Verifies multimodal extraction of `LH8942X`, `LH401`, `0220-774910-PRIO`, `FRALH44912`, and `EUR 245.00` from the generated Nano Banana props.
-* **EVAL-03 (`gemini-3.8-live-extended-thinking` Live WebSocket Telemetry)**: Streams video frames + audio/text over `BidiGenerateContent`, verifying `interaction_status` (`IN_PROGRESS` ➔ `IDLE`), 24kHz native audio output, and asynchronous tool invocation.
+* **EVAL-03 (`gemini-3.8-live-extended-thinking` Live WebSocket Telemetry)**: Streams video frames + audio/text over `BidiGenerateContent`, verifying `session_init`, `interaction_status: "IN_PROGRESS"` (`sawInProgress: true`), 24kHz native audio output (`60` audio chunks received during spoken filler & synthesis), and concurrent asynchronous invocation of the 3 `NON_BLOCKING` lookup tools (`scan_boarding_pass_and_bag_tag`, `search_star_alliance_partner_flights`, `evaluate_eu261_and_vip_entitlement`). Note: `sawIdle` is recorded as `false` in the 24-second test window because the live session remains active while streaming the multi-tool spoken synthesis.
 * **EVAL-04 (EU261 Legal & VIP Policy Rubric Grading)**: Uses `gemini-3.8-flash` as an LLM Judge to grade the 4 mandatory legal & VIP compensation criteria (**100% Pass Rate**).
+

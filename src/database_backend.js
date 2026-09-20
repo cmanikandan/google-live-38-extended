@@ -3,7 +3,7 @@
  *
  * Architecture:
  * 1. Cloud Engine: Google Cloud BigQuery (`star_alliance_concierge` dataset) +
- *    Google Cloud Firestore (`concierge_rebookings` collection) in project `your-gcp-project-id`.
+ *    Google Cloud Firestore (`concierge_rebookings` collection) in your configured GCP project (`GCP_PROJECT_ID`).
  * 2. Local Relational SQL & Transactional Store (`better-sqlite3` at `data/concierge_enterprise.db`):
  *    Executes real parameterized SQL queries and ACID transactions (`SELECT`, `JOIN`, `INSERT`, `UPDATE`)
  *    and automatically syncs with BigQuery + Firestore when Application Default Credentials (ADC) are active.

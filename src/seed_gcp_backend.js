@@ -1,6 +1,6 @@
 /**
  * Provisions and seeds the Google Cloud BigQuery dataset (`star_alliance_concierge`)
- * and Firestore collection (`concierge_rebookings`) in project `your-gcp-project-id`.
+ * and Firestore collection (`concierge_rebookings`) in your configured `GCP_PROJECT_ID`.
  *
  * Run after authenticating ADC (`gcloud auth application-default login`):
  *   npm run seed:gcp

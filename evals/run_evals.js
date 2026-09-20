@@ -5,7 +5,7 @@
  * Tests:
  * 1. NON_BLOCKING Tool Declaration & CRM/WorldTracer/EU261 Engine Integrity
  * 2. Multimodal Visual OCR Extraction on Generated Sample Boarding Pass & Hotel Receipt Images
- * 3. Live WebSocket Protocol Lifecycle (`gemini-3.8-live-extended-thinking`, `interaction_status: IN_PROGRESS -> IDLE`, `realtimeInput.video`, async `NON_BLOCKING` tool execution)
+ * 3. Live WebSocket Protocol Lifecycle (`gemini-3.8-live-extended-thinking`, `interaction_status: IN_PROGRESS`, `realtimeInput.video`, 24kHz audio stream, async `NON_BLOCKING` tool execution)
  * 4. Multi-Constraint Legal & VIP Policy Reasoning (EU261 Art. 5(3) Weather Exemption vs. Art. 9 Right to Care + Star Alliance Gold/1K Priority Override)
  */
 
