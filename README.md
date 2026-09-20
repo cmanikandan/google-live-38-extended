@@ -136,7 +136,6 @@ npm start
 * **Main Split-Screen Concierge App (Auto-Starts Live Webcam Stream):** [http://localhost:3080](http://localhost:3080)
 * **Live Database Table & Transaction Inspector (JSON):** [http://localhost:3080/api/db-state](http://localhost:3080/api/db-state)
 * **Printable Boarding Pass, Receipt & Architecture Kit:** [http://localhost:3080/samples/printable-demo-kit.html](http://localhost:3080/samples/printable-demo-kit.html)
-* **Full 2-Step Stage Script:** [`DEMO_TALKING_SCRIPT.md`](DEMO_TALKING_SCRIPT.md)
 
 ### 3. Run the Automated 4-Stage Evaluation Suite (`4/4 Passed`)
 ```bash

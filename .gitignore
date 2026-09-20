@@ -15,3 +15,7 @@ data/*.db
 data/*.db-wal
 data/*.db-shm
 
+# Personal notes & talking script (do not push to public repo)
+DEMO_TALKING_SCRIPT.md
+
+
